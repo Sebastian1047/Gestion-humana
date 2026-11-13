@@ -1,0 +1,25 @@
+# Archivos sensibles o locales: nunca publicar datos de produccion
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.pfx
+*.bak
+*.backup
+*.sql
+*.sqlite
+*.sqlite3
+*.dbf
+/vendor/
+/node_modules/
+/.idea/
+/.vscode/
+/uploads/**
+/data/*.db
+/data/*.sqlite*
+/data/*.jsonl
+*.log
+Thumbs.db
+.DS_Store
