@@ -1,0 +1,41 @@
+COPIA DE DEMOSTRACION PARA REVISION
+
+Esta copia conserva las vistas, estilos, formularios y JavaScript de la aplicacion original.
+El backend fue sustituido por respuestas locales de solo lectura con datos ficticios.
+No es una copia operativa de produccion ni permite validar las integraciones originales.
+
+INICIAR
+1. Extraer el ZIP completo.
+2. Usar PHP 8.0 o superior. No requiere Composer, SQL Server ni extensiones SQL/cURL.
+3. En Windows abrir INICIAR_DEMO.bat, o ejecutar desde esta carpeta:
+   php -S 127.0.0.1:8095 -t .
+4. Abrir http://127.0.0.1:8095/View/login.php
+5. Codigo: DEMO. Contrasena: DEMO. Son valores publicos de ejemplo.
+6. Para terminar, cerrar el servidor o presionar Ctrl+C.
+
+PARA REVISAR
+- Inicio, menu, preingreso y formulario de entrevista con sus pasos.
+- Dotaciones: tres personas ficticias; busqueda, filtros, detalle y formulario de edicion.
+- Nueva dotacion: buscar 'Demo' o 'DEMO001' y completar el formulario visualmente.
+- Datos de ejemplo fechados el 13 de noviembre de 2026 para filtros por fecha.
+- Equivalencias: un articulo ficticio de solo lectura.
+- Papelera vacia y pantallas de tallas/existencias.
+- Reportes: vista de ejemplo imprimible, sin reproduccion del exportador original.
+
+DESHABILITADO
+- Guardar, actualizar, confirmar entregas, eliminar, restaurar y vaciar papelera.
+- Subir/procesar archivos, comparar inventarios reales y generar archivos de produccion.
+- Recuperar o cambiar contrasenas. No hay autenticacion contra sistemas reales.
+- Conexiones a bases de datos y peticiones HTTP desde PHP.
+
+EXCLUIDO
+- Credenciales, IP y URL internas, configuracion original de conexiones.
+- Todos los uploads originales, firmas, PDF de entrevista y caches de personas.
+- Archivos data originales, copias de respaldo, SQL, configuracion de editor y vendor.
+- horassem.dbf y el archivo comprimido de produccion.
+
+La sesion de PHP se usa unicamente para el acceso local de demostracion.
+No se guardan formularios, firmas ni documentos. No ingresar datos personales reales.
+Los nombres, codigos, areas y articulos del ejemplo fueron inventados.
+Se conservan el nombre corporativo, logos y la estructura visible para revisar el diseno.
+Compartir solo este ZIP. No mezclar esta copia con la carpeta de produccion.

@@ -1,0 +1,94 @@
+/* Misma estructura que GestorDocumentos (JS): solo cambian los colores (tema JN). */
+
+.hero-preingreso {
+  background: linear-gradient(
+        135deg,
+        #5c0404,
+        #780606
+    );
+  border-radius: 20px;
+  padding: 40px;
+  color: white;
+  margin-bottom: 30px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.12);
+}
+
+.hero-preingreso h1 {
+  font-size: 2.2rem;
+  margin-bottom: 10px;
+}
+
+.hero-preingreso h2 {
+  font-size: 1.3rem;
+  margin-bottom: 15px;
+  font-weight: 500;
+}
+
+.hero-preingreso p {
+  max-width: 700px;
+  line-height: 1.7;
+}
+
+.documentos-grid {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 25px;
+  margin-bottom: 30px;
+}
+
+.documento-card {
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid #edf2f7;
+  box-shadow: 0 4px 15px rgba(0,0,0,.05);
+  transition: .3s;
+  display: flex;
+  flex-direction: column;
+  min-height: 260px;
+}
+
+.documento-card:hover {
+  transform: translateY(-6px);
+  border-color: #780606;
+  box-shadow: 0 10px 25px rgba(0,0,0,.10);
+}
+
+.documento-icono {
+  font-size: 2.8rem;
+  margin-bottom: 20px;
+}
+
+.documento-card h3 {
+  color: #5c0404;
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+}
+
+.documento-card p {
+  color: #64748b;
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+
+.documento-card span {
+  margin-top: auto;
+  color: #780606;
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .documentos-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-preingreso {
+    padding: 25px;
+  }
+
+  .hero-preingreso h1 {
+    font-size: 1.8rem;
+  }
+}

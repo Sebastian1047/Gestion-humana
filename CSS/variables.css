@@ -1,0 +1,71 @@
+/* =============================================
+   variables.css — Tokens de diseño (colores + tipografía)
+   Fuente única de verdad para la identidad visual del sistema JN.
+   Debe cargarse ANTES que cualquier otra hoja de estilo.
+   ============================================= */
+
+:root {
+  /* ---- Colores de marca ----
+     Misma estructura tonal que variables.css de JS (primario vivo +
+     oscuro para contraste/gravedad + claro para fondos), anclada al
+     rojo sangre #780606 pedido, en vez de un rosado desaturado. */
+  --color-primario: #780606;
+  --color-primario-hover: #5c0404;
+  --color-primario-oscuro: #2b0202;
+  --color-primario-claro: #f0e6e6;
+
+  /* ---- Acciones destructivas / peligro ----
+     Tono deliberadamente distinto del primario (vermellón/naranja-rojo
+     en vez de rojo sangre) para que "peligro" siga leyéndose distinto
+     de la marca, igual que en JS el peligro (rojo) contrasta con el
+     primario (azul). */
+  --color-peligro: #b3350f;
+  --color-peligro-hover: #8a2809;
+
+  /* ---- Acción secundaria (editar / confirmar positivo) ---- */
+  --color-secundario: #38a169;
+  --color-secundario-hover: #276749;
+
+  /* ---- Neutros / cancelar ---- */
+  --color-gris-cancelar-bg: #e2e8f0;
+  --color-gris-cancelar-texto: #4a5568;
+  --color-gris-cancelar-hover: #cbd5e0;
+
+  /* ---- Mensajes de estado ---- */
+  --color-exito-bg: #d1fae5;
+  --color-exito-texto: #065f46;
+  --color-exito-borde: #6ee7b7;
+
+  --color-error-bg: #fee2e2;
+  --color-error-texto: #991b1b;
+  --color-error-borde: #fca5a5;
+
+  --color-aviso-bg: #fffbeb;
+  --color-aviso-texto: #92400e;
+  --color-aviso-borde: #fbbf24;
+
+  /* ---- Variantes propias de JN (usos puntuales ya existentes en el diseño) ----
+     Estos tokens no tienen equivalente en JS: existían como colores sueltos
+     en el CSS original de JN y se centralizaron aquí tal cual, sin cambiar
+     el resultado visual. */
+  --color-primario-degradado: #a31616;   /* extremo claro del degradado de #btnInformeDotaciones */
+  --color-hero-degradado: #9e2323;       /* extremo claro del degradado de .hero-dashboard */
+  --color-panel-header-degradado: #931a1a; /* extremo claro del degradado de .panel-persona-header */
+  --color-confirm-especial: var(--color-peligro);      /* botón "Sí, cerrar sesión" / .btn-confirm en los modales */
+  --color-confirm-especial-hover: var(--color-peligro-hover);
+  --color-acento-login: #22c55e;         /* botón "Ingresar" y enlaces de la pantalla de login */
+  --color-acento-login-hover: #16a34a;
+
+  /* ---- Tipografía ---- */
+  --fuente-base: "Segoe UI", Arial, sans-serif;
+
+  --tamano-titulo-seccion: 1.05rem;
+  --tamano-subtitulo: 0.82rem;
+  --tamano-cuerpo: 0.9rem;
+  --tamano-pequeno: 0.78rem;
+
+  /* ---- Bordes / sombras comunes ---- */
+  --radio-tarjeta: 10px;
+  --radio-boton: 8px;
+  --sombra-tarjeta: 0 1px 4px rgba(0, 0, 0, 0.06);
+}

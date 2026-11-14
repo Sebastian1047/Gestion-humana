@@ -1,0 +1,19 @@
+VERIFICACION DE LA COPIA DE DEMOSTRACION
+
+- 46 archivos PHP revisados: sintaxis valida con PHP 8.4.
+- JavaScript: sintaxis valida con Node.
+- Acceso local DEMO/DEMO comprobado mediante HTTP.
+- Todas las vistas PHP principales responden sin avisos ni errores PHP.
+- Consultas ficticias de personas, busqueda, filtros por fecha y detalle comprobadas.
+- Listado ficticio de equivalencias, papelera vacia e informe de ejemplo comprobados.
+- Guardar, actualizar, confirmar, eliminar, subir archivos y cambiar contrasenas: bloqueados.
+- Las pruebas no modificaron ningun archivo de la aplicacion.
+- Escaneo de la entrega: sin IP privadas ni credenciales originales conocidas.
+- Sin llamadas de conexion HTTP/SQL ni funciones de escritura de documentos en el backend.
+- Solo se incluye data/demo.json, con informacion ficticia creada para esta copia.
+- No se incluyen documentos originales, firmas, DBF, SQL, caches ni respaldos.
+
+Limites: no se verifico visualmente la copia en navegador. La comprobacion de vistas
+se realizo por HTTP y la de JavaScript fue de sintaxis. Los servicios reales fueron
+retirados; esta copia permite revisar la interfaz y ejemplos de consulta, pero no
+certifica el funcionamiento de las integraciones ni de los procesos de produccion.

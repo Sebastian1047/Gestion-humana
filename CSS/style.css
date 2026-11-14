@@ -1,0 +1,398 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+body {
+  background: linear-gradient(135deg, #d9ddd5, #c6cfbf);
+}
+
+/* Layout principal */
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+/* ── Hamburger button (solo móvil) ── */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  z-index: 1100;
+  background: #8b2816;
+  border: none;
+  border-radius: 8px;
+  width: 42px;
+  height: 42px;
+  cursor: pointer;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0;
+}
+.hamburger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: #fff;
+  border-radius: 2px;
+  transition: all 0.3s;
+}
+.hamburger.open span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+.hamburger.open span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Overlay oscuro cuando sidebar abierto en móvil */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 900;
+}
+.sidebar-overlay.active {
+  display: block;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 250px;
+  background-color: #8b2816;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+  z-index: 1000;
+}
+
+.logo {
+  text-align: center;
+  padding: 20px;
+}
+
+.logo img {
+  width: 180px;
+  margin-bottom: 0px;
+}
+
+.logo h2 {
+  font-size: 20px;
+}
+
+.menu ul {
+  list-style: none;
+  padding: 20px;
+}
+
+.menu li {
+  margin-bottom: 10px;
+}
+
+.menu a {
+  display: block;
+  padding: 12px;
+  border-radius: 8px;
+  color: white;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.menu a:hover {
+  background-color: #ff0000;
+}
+
+.menu a.active {
+  background-color: #ff0000;
+  font-weight: bold;
+}
+
+/* Main */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+/* Header */
+.header {
+  background-color: white;
+  padding: 15px 25px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header h1 {
+  font-size: 20px;
+}
+
+.user {
+  font-weight: bold;
+}
+
+.user span {
+  font-weight: 600;
+  color: #333;
+}
+
+/* Content */
+.content {
+  padding: 20px;
+  animation: fadeUp 0.5s ease;
+}
+
+a {
+  text-decoration: none;
+  color: white;
+}
+
+/* Bienvenida */
+.bienvenida {
+  margin-bottom: 25px;
+  background: linear-gradient(135deg, #ffffff, #f1f5f9);
+  border-left: 5px solid #8b2816;
+  border-top: 5px solid #8b2816;
+  border-right: 5px solid #3d434a;
+  border-bottom: 5px solid #3d434a;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.bienvenida h2 {
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.bienvenida h3 {
+  margin-bottom: 10px;
+  color: #8b2816;
+}
+
+/* Grid de tarjetas */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+/* Tarjetas */
+.card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.card.info {
+  text-align: center;
+  transition: transform 0.2s;
+}
+
+.card.info:hover {
+  transform: translateY(-5px);
+}
+
+.icon {
+  font-size: 30px;
+  margin-bottom: 10px;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 0.5s ease forwards;
+}
+
+.card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.card:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.card:nth-child(4) {
+  animation-delay: 0.4s;
+}
+.card:nth-child(5) {
+  animation-delay: 0.5s;
+}
+
+/* Modal */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal-box {
+  background: #fff;
+  border-radius: 12px;
+  padding: 32px 28px;
+  max-width: 360px;
+  width: 90%;
+  text-align: center;
+}
+
+.modal-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #fde8e8;
+  color: #c0392b;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 8px;
+  color: #1a1a1a;
+}
+.modal-text {
+  font-size: 14px;
+  color: #666;
+  margin: 0 0 24px;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+}
+
+.btn-confirm {
+  background: #c0392b;
+  color: #fff;
+}
+.btn-confirm:hover {
+  background: #a93226;
+}
+.btn-cancel {
+  background: #f0f0f0;
+  color: #333;
+}
+.btn-cancel:hover {
+  background: #e0e0e0;
+}
+
+/* ═══════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════ */
+
+/* Tablet */
+@media (max-width: 900px) {
+  .logo img {
+    width: 130px;
+    margin-bottom: 40px;
+  }
+  .sidebar {
+    width: 220px;
+  }
+}
+
+/* Móvil */
+@media (max-width: 700px) {
+  .hamburger {
+    display: flex;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 260px;
+    transform: translateX(-100%);
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .main {
+    width: 100%;
+  }
+
+  .header {
+    padding: 14px 16px 14px 68px; /* espacio para el hamburger */
+    justify-content: flex-end;
+  }
+
+  .content {
+    padding: 16px;
+    margin-top: 0;
+  }
+
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .logo img {
+    width: 120px;
+    margin-bottom: 20px;
+  }
+
+  .bienvenida {
+    font-size: 0.9rem;
+  }
+  .bienvenida h2 {
+    font-size: 1.1rem;
+  }
+  .bienvenida h3 {
+    font-size: 1rem;
+  }
+}

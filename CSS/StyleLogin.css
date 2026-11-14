@@ -1,0 +1,283 @@
+/* =============================================
+   StyleLogin.css — login.php, recuperar.php, nueva_password.php
+   Requiere variables.css cargado antes.
+   ============================================= */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+html, body {
+  height: 100%;
+}
+
+/* ═══════════════════════════════════════════
+   Layout de dos paneles (mismo diseño que JL,
+   con la paleta roja de JN): marca a la
+   izquierda, formulario limpio a la derecha —
+   sin la "tarjeta" flotante en el medio.
+   ═══════════════════════════════════════════ */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+}
+
+/* ---- Panel de marca ---- */
+.login-panel-marca {
+  flex: 1.15;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(160deg, #1c0101, var(--color-primario-oscuro) 55%, var(--color-primario));
+  display: flex;
+  align-items: center;
+  color: #fff;
+}
+
+/* Logo gigante de fondo, a modo de marca de agua: se nota, pero nunca
+   compite con el texto ni con el formulario. */
+.marca-marca-agua {
+  position: absolute;
+  top: 50%;
+  right: 8%;
+  width: 62%;
+  max-width: 560px;
+  transform: translateY(-50%) rotate(-8deg);
+  opacity: 0.4;
+  filter: grayscale(1) brightness(2.3);
+  pointer-events: none;
+  user-select: none;
+}
+
+.marca-contenido {
+  position: relative;
+  z-index: 1;
+  padding: 60px 64px;
+  max-width: 560px;
+}
+
+.marca-eyebrow {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #e3a3a3;
+  margin-bottom: 18px;
+}
+
+.marca-titulo {
+  font-size: 2.6rem;
+  line-height: 1.25;
+  font-weight: 800;
+  margin-bottom: 20px;
+}
+
+.marca-subtitulo {
+  font-size: 1.05rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* ---- Panel de formulario ---- */
+.login-panel-form {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='84' height='84'%3E%3Cg fill='none' stroke='%23780606' stroke-width='1.3' opacity='0.24'%3E%3Ccircle cx='42' cy='42' r='5.5'/%3E%3Cpath d='M42 23c-6 5-6 10 0 10s6-5 0-10z'/%3E%3Cpath d='M61 42c-5-6-10-6-10 0s5 6 10 0z'/%3E%3Cpath d='M42 61c6-5 6-10 0-10s-6 5 0 10z'/%3E%3Cpath d='M23 42c5 6 10 6 10 0s-5-6-10 0z'/%3E%3C/g%3E%3C/svg%3E"),
+    radial-gradient(650px circle at 8% 6%, rgba(120, 6, 6, 0.08), transparent 60%),
+    radial-gradient(700px circle at 92% 12%, rgba(245, 197, 24, 0.10), transparent 58%),
+    radial-gradient(750px circle at 88% 94%, rgba(34, 138, 68, 0.09), transparent 58%),
+    radial-gradient(550px circle at 6% 92%, rgba(43, 2, 2, 0.06), transparent 55%),
+    linear-gradient(160deg, #fdfcfc, #f8f3f3);
+  background-repeat: repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 32px;
+}
+
+.login-form-box {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 360px;
+}
+
+.form-logo-movil {
+  display: none;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  margin-bottom: 20px;
+}
+
+.form-titulo {
+  font-size: 1.6rem;
+  color: var(--color-primario-oscuro);
+  margin-bottom: 6px;
+}
+
+.form-subtitulo {
+  font-size: 0.92rem;
+  color: #718096;
+  margin-bottom: 28px;
+}
+
+/* Inputs */
+.input-group {
+  margin-bottom: 18px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #2d3748;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input-group input:focus {
+  border-color: var(--color-primario);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(120, 6, 6, 0.15);
+}
+
+/* Botón */
+.btn-login {
+  width: 100%;
+  padding: 14px;
+  margin-top: 6px;
+  background: linear-gradient(135deg, var(--color-primario-oscuro), var(--color-primario));
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+.btn-login:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(43, 2, 2, 0.28);
+}
+
+.btn-login:active {
+  transform: translateY(0);
+}
+
+/* Links */
+.extra {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.extra a {
+  text-decoration: none;
+  color: var(--color-primario);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.extra a:hover {
+  text-decoration: underline;
+}
+
+/* Alertas */
+.alert {
+  padding: 12px 14px;
+  border-radius: 9px;
+  margin-bottom: 18px;
+  font-size: 0.88rem;
+}
+
+.alert.success {
+  background-color: var(--color-exito-bg);
+  color: var(--color-exito-texto);
+}
+
+.alert.error {
+  background-color: var(--color-error-bg);
+  color: var(--color-error-texto);
+}
+
+/* ═══════════════════════════════════════════
+   Responsive: por debajo de 900px el panel de
+   marca se oculta y el formulario queda a todo
+   el ancho, con el logo pequeño arriba.
+   ═══════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .login-panel-marca {
+    display: none;
+  }
+
+  .login-panel-form {
+    flex: 1 1 100%;
+  }
+
+  .form-logo-movil {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .form-titulo,
+  .form-subtitulo {
+    text-align: center;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   Compatibilidad: recuperar.php / nueva_password.php
+   siguen usando la tarjeta centrada simple (no se
+   les pidió el rediseño de dos paneles).
+   ═══════════════════════════════════════════ */
+body:has(> .login-container) {
+  background: linear-gradient(135deg, var(--color-primario-oscuro), var(--color-primario));
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.login-container {
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-card {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.login-header .logo {
+  width: 160px;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+.login-header h2,
+.login-card > h2 {
+  font-size: 22px;
+  color: var(--color-primario-oscuro);
+}

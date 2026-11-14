@@ -1,17 +1,15 @@
-# Gestión Humana — DEMO
+# Gestión humana — DEMO sin conexiones
 
-Aplicación PHP de demostración de Gestión Humana (GestorDocumentosJN), sin conexiones reales ni credenciales.
+Aplicación de demostración en PHP 8+, sin bases de datos ni conexiones reales.
 
-## Ejecución local
-
-Requiere PHP 8 o superior. Desde la raíz del proyecto:
+## Ejecutar localmente
 
 ```bash
 php -S 127.0.0.1:8095 -t .
 ```
 
-Abrir http://127.0.0.1:8095/View/login.php y usar las credenciales ficticias `DEMO` / `DEMO`.
+Visitar http://127.0.0.1:8095/View/login.php. Acceso: **DEMO / DEMO**.
 
-> Esta copia está pensada para revisión local. Las acciones de escritura y las integraciones de producción están deshabilitadas. No publicar como aplicación de producción.
+Esta versión es de solo lectura, con datos ficticios. Las operaciones de escritura e integraciones reales están deshabilitadas. No desplegar como producción.
 
-Consultar `LEEME_DEMO.txt` cuando esté incorporado el resto del proyecto.
+Ver `LEEME_DEMO.txt` para detalles.
