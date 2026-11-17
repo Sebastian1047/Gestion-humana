@@ -141,7 +141,8 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
         function renderDetalle(r) {
             var nombre = r.nombre_empleado || r.nombre || '—';
             var centroCosto = r.nombre_centro_costo || r.centro_costos || '—';
-            var fecha = r.fecha_entrega ? r.fecha_entrega.split('T')[0] : '—';
+            var fechaIngresoDato = r.fecha_ingreso || r.fechaIngreso;
+            var fechaIngreso = fechaIngresoDato ? String(fechaIngresoDato).split('T')[0] : '—';
             var docId = r.docId || '—';
 
             function tagSi(nombre, talla) {
@@ -187,7 +188,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                 '<div class="detalle-campo"><label>Código</label><span>' + r.codigo + '</span></div>' +
                 '<div class="detalle-campo"><label>Nombre</label><span>' + nombre + '</span></div>' +
                 '<div class="detalle-campo"><label>Centro de Costos</label><span>' + centroCosto + '</span></div>' +
-                '<div class="detalle-campo"><label>Pedido de Tallas</label><span>' + fecha + '</span></div>' +
+                '<div class="detalle-campo"><label>Fecha de ingreso</label><span>' + fechaIngreso + '</span></div>' +
                 '<div class="detalle-campo"><label>Documento</label><span>' + docId + '</span></div>' +
                 (esVerdadero(r.entrega_confirmada) ? '<div class="detalle-campo"><label>Entregado en</label><span>' + (r.fecha_confirmacion_entrega ? r.fecha_confirmacion_entrega.split('T')[0] : '—') + '</span></div>' : '') +
                 '</div></div>' +
@@ -227,7 +228,8 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
         function renderDocImpresion(r) {
             var nombre = r.nombre_empleado || r.nombre || '—';
             var centroCosto = r.nombre_centro_costo || r.centro_costos || '—';
-            var fecha = r.fecha_entrega ? r.fecha_entrega.split('T')[0] : '—';
+            var fechaIngresoDato = r.fecha_ingreso || r.fechaIngreso;
+            var fechaIngreso = fechaIngresoDato ? String(fechaIngresoDato).split('T')[0] : '—';
             var docId = r.docId || '—';
 
             // Solo se llama cuando la prenda SÍ se entrega
@@ -294,7 +296,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                 '<tr><td style="padding:5px 0;color:#555;width:160px;"><strong>Código:</strong></td><td>' + r.codigo + '</td>' +
                 '<td style="padding:5px 0;color:#555;width:160px;"><strong>Nombre:</strong></td><td>' + nombre + '</td></tr>' +
                 '<tr><td style="padding:5px 0;color:#555;"><strong>Centro de Costos:</strong></td><td>' + centroCosto + '</td>' +
-                '<td style="padding:5px 0;color:#555;"><strong>Pedido de Tallas:</strong></td><td>' + fecha + '</td></tr>' +
+                '<td style="padding:5px 0;color:#555;"><strong>Fecha de ingreso:</strong></td><td>' + fechaIngreso + '</td></tr>' +
                 '<tr><td style="padding:5px 0;color:#555;"><strong>Documento:</strong></td><td>' + docId + '</td>' +
                 (esVerdadero(r.entrega_confirmada) ? '<td style="padding:5px 0;color:#555;"><strong>Entregado en:</strong></td><td>' + (r.fecha_confirmacion_entrega ? r.fecha_confirmacion_entrega.split('T')[0] : '—') + '</td>' : '<td></td><td></td>') + '</tr>' +
                 '</table></div>' +
