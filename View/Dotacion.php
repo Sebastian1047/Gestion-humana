@@ -106,10 +106,6 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                             ⚠️ Sin firma de encargado
                         </label>
 
-                        <label style="display:flex;align-items:center;gap:8px;margin:0;font-size:0.9rem;color:#4a5568;cursor:pointer;">
-                            <input type="checkbox" id="filtroSinConfirmar" style="width:16px;height:16px;cursor:pointer;">
-                            ⏳ Sin confirmar entrega
-                        </label>
                     </div>
 
                     <div id="contadorPersonas" style="font-size:0.85rem;font-weight:600;color:#4a5568;text-align:right;line-height:1.5;">
