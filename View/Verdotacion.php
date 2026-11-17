@@ -23,6 +23,54 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
     <link rel="stylesheet" href="../CSS/variables.css" />
     <link rel="stylesheet" href="../CSS/StyleDotacion.css" />
     <link rel="stylesheet" href="../CSS/NewDotStyle.css" />
+    <style>
+        /* Comprobante individual de dotación: compacto para impresión A4. */
+        #print-doc .condiciones-dotacion {
+            margin: 0 0 12px;
+            color: #1e293b;
+            font-size: 9pt;
+            line-height: 1.28;
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+
+        #print-doc .condiciones-dotacion h2,
+        #print-doc .condiciones-dotacion h3 {
+            font-size: 9pt;
+            font-weight: 700;
+            margin: 0 0 5px;
+            text-transform: uppercase;
+        }
+
+        #print-doc .condiciones-dotacion h3 {
+            margin-top: 7px;
+        }
+
+        #print-doc .condiciones-dotacion p {
+            margin: 0 0 5px;
+        }
+
+        @page {
+            size: A4;
+            margin: 7mm;
+        }
+
+        @media print {
+            #print-doc {
+                max-width: none !important;
+                padding: 6px 12px !important;
+            }
+
+            #print-doc table {
+                min-width: 0;
+            }
+
+            #print-doc th,
+            #print-doc td {
+                white-space: normal;
+            }
+        }
+    </style>
 
 </head>
 
@@ -270,6 +318,17 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                 '<div style="padding:10px 14px;border:1px solid #e2e8f0;border-radius:6px;background:#fafafa;font-size:10pt;white-space:pre-wrap;color:#2d3748;min-height:40px;">' +
                 (r.observaciones ? escapeHtml(r.observaciones) : '<em style="color:#a0aec0;">Sin observaciones</em>') +
                 '</div></div>' +
+
+                // Condiciones de uso y constancia para el PDF individual
+                '<section class="condiciones-dotacion">' +
+                '<h2>JARDINES DE SAN NICOLÁS S.A.S.</h2>' +
+                '<p>JARDINES DE SAN NICOLÁS S.A.S. hace entrega de dotación de conformidad con la normativa laboral vigente.</p>' +
+                '<p>La dotación entregada es de uso exclusivo del trabajador que la recibe y deberá utilizarse para el desempeño de sus labores dentro de la empresa.</p>' +
+                '<p>Queda prohibido regalar, vender, prestar o destinar la dotación a fines diferentes de aquellos para los cuales fue suministrada.</p>' +
+                '<p>El trabajador declara haber recibido la dotación y se compromete a cumplir las condiciones de uso aquí establecidas.</p>' +
+                '<h3>CONSTANCIA DE RECIBO Y COMPROMISO</h3>' +
+                '<p>Acuso recibo de la dotación entregada y manifiesto mi compromiso de cumplir las condiciones aquí establecidas.</p>' +
+                '</section>' +
 
                 // Firmas
                 '<div style="margin-bottom:24px;">' +
