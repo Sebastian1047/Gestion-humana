@@ -1110,3 +1110,42 @@
   display: flex;
   gap: 10px;
 }
+
+/* Cambio de carnet: pregunta visible fuera de la fila de datos del trabajador. */
+.carnet-deterioro {
+    margin: 16px 0 0;
+    padding: 12px 18px 16px;
+    border: 1px solid #dfb7b7;
+    border-left: 4px solid #780606;
+    border-radius: 8px;
+    background: #fffafa;
+    min-width: 0;
+}
+.carnet-deterioro legend {
+    padding: 0 8px;
+    color: #780606;
+    font-size: 1rem;
+    font-weight: 700;
+}
+.carnet-opciones {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 26px;
+    padding-top: 4px;
+}
+.carnet-opcion {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: #1e293b;
+}
+.carnet-opcion input[type="radio"] {
+    width: 19px;
+    height: 19px;
+    accent-color: #780606;
+    cursor: pointer;
+}
