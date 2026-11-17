@@ -14,7 +14,8 @@
       "registros_sin_firma": 1,
       "registros_sin_firma_trabajador": 1,
       "registros_sin_firma_encargado": 1,
-      "registros_confirmados": 0
+      "registros_confirmados": 0,
+      "fecha_ingreso": "2025-03-10"
     },
     {
       "codigo": "DEMO002",
@@ -30,7 +31,8 @@
       "registros_sin_firma": 1,
       "registros_sin_firma_trabajador": 1,
       "registros_sin_firma_encargado": 1,
-      "registros_confirmados": 0
+      "registros_confirmados": 0,
+      "fecha_ingreso": "2024-08-12"
     },
     {
       "codigo": "DEMO003",
@@ -46,7 +48,8 @@
       "registros_sin_firma": 1,
       "registros_sin_firma_trabajador": 1,
       "registros_sin_firma_encargado": 1,
-      "registros_confirmados": 0
+      "registros_confirmados": 0,
+      "fecha_ingreso": "2026-02-16"
     }
   ],
   "dotaciones": [
@@ -105,7 +108,8 @@
       "zapatos_genero": "M",
       "botas": 1,
       "botas_talla": "39",
-      "botas_genero": "M"
+      "botas_genero": "M",
+      "fecha_ingreso": "2025-03-10"
     },
     {
       "codigo": "DEMO002",
@@ -162,7 +166,8 @@
       "zapatos_genero": "F",
       "botas": 1,
       "botas_talla": "39",
-      "botas_genero": "F"
+      "botas_genero": "F",
+      "fecha_ingreso": "2024-08-12"
     },
     {
       "codigo": "DEMO003",
@@ -219,7 +224,8 @@
       "zapatos_genero": "M",
       "botas": 1,
       "botas_talla": "39",
-      "botas_genero": "M"
+      "botas_genero": "M",
+      "fecha_ingreso": "2026-02-16"
     }
   ],
   "equivalencias": [
