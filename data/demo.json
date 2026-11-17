@@ -109,7 +109,8 @@
       "botas": 1,
       "botas_talla": "39",
       "botas_genero": "M",
-      "fecha_ingreso": "2025-03-10"
+      "fecha_ingreso": "2025-03-10",
+      "cambio_carnet_deterioro": "si"
     },
     {
       "codigo": "DEMO002",
@@ -167,7 +168,8 @@
       "botas": 1,
       "botas_talla": "39",
       "botas_genero": "F",
-      "fecha_ingreso": "2024-08-12"
+      "fecha_ingreso": "2024-08-12",
+      "cambio_carnet_deterioro": "no"
     },
     {
       "codigo": "DEMO003",
@@ -225,7 +227,8 @@
       "botas": 1,
       "botas_talla": "39",
       "botas_genero": "M",
-      "fecha_ingreso": "2026-02-16"
+      "fecha_ingreso": "2026-02-16",
+      "cambio_carnet_deterioro": "no"
     }
   ],
   "equivalencias": [
