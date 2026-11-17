@@ -131,7 +131,6 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                 }
                 renderDetalle(d);
                 renderDocImpresion(d);
-                activarConfirmarEntrega(d);
             })
             .catch(function() {
                 mostrarError('Error de conexión.');
@@ -210,8 +209,6 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                 '<div class="firma-detalle-bloque"><label>Firma del Encargado</label>' +
                 '<div class="firma-img-wrap">' + firmaHTML(r.firma_encargado) + '</div></div>' +
                 '</div></div>' +
-
-                bloqueConfirmarEntrega(r) +
 
                 '<div class="card-seccion">' +
                 '<h3 class="seccion-titulo">Observaciones</h3>' +
@@ -352,163 +349,6 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                 '<div style="border-top:1px solid #ccc;padding-top:8px;text-align:center;">' +
                 '<p style="font-size:8pt;color:#888;margin:0;">Generado por el Sistema de Dotaciones — ' + new Date().toLocaleDateString('es-CO') + '</p>' +
                 '</div>';
-        }
-
-        // ── Confirmación de entrega ──────────────────────────────────────────
-        var TEXTO_COMPROMISO_ENTREGA = 'Al firmar, confirmo que recibí completa y correctamente las prendas y tallas relacionadas en este registro.';
-
-        function bloqueConfirmarEntrega(r) {
-            var tieneFirmasSolicitud = r.firma_trabajador && r.firma_encargado;
-
-            if (esVerdadero(r.entrega_confirmada)) {
-                var fechaConf = r.fecha_confirmacion_entrega ? r.fecha_confirmacion_entrega.split('T')[0] : '—';
-                return '<div class="card-seccion">' +
-                    '<h3 class="seccion-titulo">Confirmación de Entrega</h3>' +
-                    '<div style="background:#d1fae5;border:1px solid #6ee7b7;color:#065f46;padding:14px 18px;border-radius:10px;margin-bottom:18px;font-weight:600;">' +
-                    '✅ Entregado en ' + fechaConf + (r.confirmado_por ? ' por ' + r.confirmado_por : '') +
-                    '</div>' +
-                    '<div class="firmas-detalle">' +
-                    '<div class="firma-detalle-bloque"><label>Firma de Entrega — Trabajador</label>' +
-                    '<div class="firma-img-wrap">' + (r.firma_entrega_trabajador ? '<img src="' + BASE_URL + r.firma_entrega_trabajador + '" alt="Firma">' : '<span class="firma-vacia">Sin firma</span>') + '</div></div>' +
-                    '<div class="firma-detalle-bloque"><label>Firma de Entrega — Encargado</label>' +
-                    '<div class="firma-img-wrap">' + (r.firma_entrega_encargado ? '<img src="' + BASE_URL + r.firma_entrega_encargado + '" alt="Firma">' : '<span class="firma-vacia">Sin firma</span>') + '</div></div>' +
-                    '</div></div>';
-            }
-
-            if (!tieneFirmasSolicitud) {
-                return '<div class="card-seccion">' +
-                    '<h3 class="seccion-titulo">Confirmación de Entrega</h3>' +
-                    '<p style="color:#a0aec0;font-size:0.9rem;">Este registro debe tener las 2 firmas de la solicitud (trabajador y encargado) antes de poder confirmar la entrega física de las prendas.</p>' +
-                    '</div>';
-            }
-
-            return '<div class="card-seccion">' +
-                '<h3 class="seccion-titulo">Confirmación de Entrega</h3>' +
-                '<p style="color:#718096;font-size:0.9rem;margin-bottom:14px;">Cuando se entreguen físicamente las prendas a la persona, confirma aquí con una firma nueva del trabajador y del encargado.</p>' +
-                '<button type="button" class="btn btn-guardar" id="btn-mostrar-confirmar-entrega">&#10003; Confirmar Entrega</button>' +
-                '<div id="panel-confirmar-entrega" style="display:none;margin-top:18px;">' +
-                '<div style="background:var(--color-primario-claro);border:1px solid var(--color-primario);color:var(--color-primario-oscuro);padding:12px 16px;border-radius:8px;margin-bottom:18px;font-size:0.88rem;">' + TEXTO_COMPROMISO_ENTREGA + '</div>' +
-                '<div class="firmas-grid">' +
-                '<div class="firma-bloque">' +
-                '<label class="firma-label">Firma del Trabajador</label>' +
-                '<div class="canvas-wrap" id="wrap_entrega_trabajador"><canvas id="canvas_entrega_trabajador"></canvas><span class="canvas-hint">Firme aquí</span></div>' +
-                '<div class="firma-acciones"><button type="button" class="btn btn-limpiar" id="limpiar_entrega_trabajador">&#10005; Limpiar</button>' +
-                '<span class="firma-estado" id="estado_entrega_trabajador">Sin firma</span></div>' +
-                '</div>' +
-                '<div class="firma-bloque">' +
-                '<label class="firma-label">Firma del Encargado</label>' +
-                '<div class="canvas-wrap" id="wrap_entrega_encargado"><canvas id="canvas_entrega_encargado"></canvas><span class="canvas-hint">Firme aquí</span></div>' +
-                '<div class="firma-acciones"><button type="button" class="btn btn-limpiar" id="limpiar_entrega_encargado">&#10005; Limpiar</button>' +
-                '<span class="firma-estado" id="estado_entrega_encargado">Sin firma</span></div>' +
-                '</div>' +
-                '</div>' +
-                '<div class="botones-wrap">' +
-                '<button type="button" class="btn btn-guardar" id="btn-confirmar-entrega-final">&#10003; Confirmar</button>' +
-                '<button type="button" class="btn btn-cancelar" id="btn-cancelar-confirmar-entrega">&#10005; Cancelar</button>' +
-                '</div>' +
-                '<div id="mensaje-confirmar-entrega" class="mensaje-oculto" style="margin-top:14px;"></div>' +
-                '</div></div>';
-        }
-
-        function activarConfirmarEntrega(r) {
-            var btnMostrar = document.getElementById('btn-mostrar-confirmar-entrega');
-            if (!btnMostrar) return; // ya confirmada, o no tiene las firmas de solicitud
-
-            var panel = document.getElementById('panel-confirmar-entrega');
-            var firmaEntregaTrabajador = null;
-            var firmaEntregaEncargado = null;
-            var canvasInicializados = false;
-
-            btnMostrar.addEventListener('click', function() {
-                panel.style.display = 'block';
-                btnMostrar.style.display = 'none';
-                if (!canvasInicializados) {
-                    initFirmaCanvas({
-                        canvas: 'canvas_entrega_trabajador',
-                        hidden: null,
-                        btnLimpiar: 'limpiar_entrega_trabajador',
-                        estado: 'estado_entrega_trabajador',
-                        wrap: 'wrap_entrega_trabajador',
-                        claseActivo: 'activo',
-                        capturaEnVivo: false,
-                        capturaEnSuelta: true,
-                        dpiAware: false,
-                        onCambio: function(v) {
-                            firmaEntregaTrabajador = v;
-                        },
-                    });
-                    initFirmaCanvas({
-                        canvas: 'canvas_entrega_encargado',
-                        hidden: null,
-                        btnLimpiar: 'limpiar_entrega_encargado',
-                        estado: 'estado_entrega_encargado',
-                        wrap: 'wrap_entrega_encargado',
-                        claseActivo: 'activo',
-                        capturaEnVivo: false,
-                        capturaEnSuelta: true,
-                        dpiAware: false,
-                        onCambio: function(v) {
-                            firmaEntregaEncargado = v;
-                        },
-                    });
-                    canvasInicializados = true;
-                }
-            });
-
-            document.getElementById('btn-cancelar-confirmar-entrega').addEventListener('click', function() {
-                panel.style.display = 'none';
-                btnMostrar.style.display = 'inline-flex';
-            });
-
-            document.getElementById('btn-confirmar-entrega-final').addEventListener('click', function() {
-                var divMsg = document.getElementById('mensaje-confirmar-entrega');
-                if (!firmaEntregaTrabajador || !firmaEntregaEncargado) {
-                    divMsg.textContent = 'Se requieren ambas firmas (trabajador y encargado) para confirmar la entrega.';
-                    divMsg.className = 'mensaje-error';
-                    divMsg.style.display = 'block';
-                    return;
-                }
-
-                var btn = this;
-                btn.disabled = true;
-                btn.textContent = 'Confirmando...';
-
-                var formData = new FormData();
-                formData.append('id', r.id);
-                formData.append('firma_entrega_trabajador', firmaEntregaTrabajador);
-                formData.append('firma_entrega_encargado', firmaEntregaEncargado);
-
-                fetch('../Controller/DotacionController.php?action=confirmar_entrega', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(function(res) {
-                        return res.json();
-                    })
-                    .then(function(data) {
-                        if (data.success) {
-                            divMsg.textContent = '✅ ' + data.message;
-                            divMsg.className = 'mensaje-exito';
-                            divMsg.style.display = 'block';
-                            setTimeout(function() {
-                                window.location.reload();
-                            }, 1500);
-                            return;
-                        }
-                        divMsg.textContent = '❌ ' + (data.message || 'Error al confirmar la entrega.');
-                        divMsg.className = 'mensaje-error';
-                        divMsg.style.display = 'block';
-                        btn.disabled = false;
-                        btn.textContent = '✓ Confirmar';
-                    })
-                    .catch(function() {
-                        divMsg.textContent = '❌ Error de conexión.';
-                        divMsg.className = 'mensaje-error';
-                        divMsg.style.display = 'block';
-                        btn.disabled = false;
-                        btn.textContent = '✓ Confirmar';
-                    });
-            });
         }
 
         function escapeHtml(str) {
