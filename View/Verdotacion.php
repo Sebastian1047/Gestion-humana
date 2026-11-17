@@ -230,6 +230,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
             var centroCosto = r.nombre_centro_costo || r.centro_costos || '—';
             var fechaIngresoDato = r.fecha_ingreso || r.fechaIngreso;
             var fechaIngreso = fechaIngresoDato ? String(fechaIngresoDato).split('T')[0] : '—';
+            var fechaEntrega = r.fecha_entrega ? String(r.fecha_entrega).split('T')[0] : '—';
             var docId = r.docId || '—';
 
             // Solo se llama cuando la prenda SÍ se entrega
@@ -331,6 +332,9 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                 '<h3>CONSTANCIA DE RECIBO Y COMPROMISO</h3>' +
                 '<p>Acuso recibo de la dotación entregada y manifiesto mi compromiso de cumplir las condiciones aquí establecidas.</p>' +
                 '</section>' +
+
+                // Fecha de entrega, inmediatamente antes de las firmas del comprobante
+                '<div style="font-size:9pt;color:#1e293b;margin:0 0 7px;"><strong>Fecha de entrega:</strong> ' + fechaEntrega + '</div>' +
 
                 // Firmas
                 '<div style="margin-bottom:24px;">' +
