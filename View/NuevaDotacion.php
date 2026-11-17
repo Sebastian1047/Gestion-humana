@@ -105,16 +105,20 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                                 </select>
                             </div>
 
-                            <div class="form-group">
-                                <label for="cambio_carnet_deterioro">Cambio de carnet por deterioro</label>
-                                <select name="cambio_carnet_deterioro" id="cambio_carnet_deterioro" class="input">
-                                    <option value="">Selecciona</option>
-                                    <option value="si">Sí</option>
-                                    <option value="no">No</option>
-                                </select>
-                            </div>
-
                         </div>
+
+                        <!-- Pregunta destacada: cambio de carnet -->
+                        <fieldset class="carnet-deterioro">
+                            <legend>¿Cambio de carnet por deterioro?</legend>
+                            <div class="carnet-opciones">
+                                <label class="carnet-opcion">
+                                    <input type="radio" name="cambio_carnet_deterioro" value="si"> Sí
+                                </label>
+                                <label class="carnet-opcion">
+                                    <input type="radio" name="cambio_carnet_deterioro" value="no"> No
+                                </label>
+                            </div>
+                        </fieldset>
                     </div>
 
                     <!-- ========== PRENDAS ENTREGADAS ========== -->
