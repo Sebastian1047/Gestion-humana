@@ -190,6 +190,10 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                 '<div class="detalle-campo"><label>Centro de Costos</label><span>' + centroCosto + '</span></div>' +
                 '<div class="detalle-campo"><label>Fecha de ingreso</label><span>' + fechaIngreso + '</span></div>' +
                 '<div class="detalle-campo"><label>Documento</label><span>' + docId + '</span></div>' +
+                '<div class="detalle-campo"><label>Cambio de carnet por deterioro</label><span>' +
+                (['si', 'sí', '1', 'true'].includes(String(r.cambio_carnet_deterioro).toLowerCase()) ? 'Sí' :
+                    ['no', '0', 'false'].includes(String(r.cambio_carnet_deterioro).toLowerCase()) ? 'No' : 'No registrado') +
+                '</span></div>' +
                 (esVerdadero(r.entrega_confirmada) ? '<div class="detalle-campo"><label>Entregado en</label><span>' + (r.fecha_confirmacion_entrega ? r.fecha_confirmacion_entrega.split('T')[0] : '—') + '</span></div>' : '') +
                 '</div></div>' +
 
