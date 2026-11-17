@@ -34,7 +34,6 @@ document.addEventListener("DOMContentLoaded", function () {
   var filtroSinNinguna = document.getElementById("filtroSinNinguna");
   var filtroSinFirmaTrabajador = document.getElementById("filtroSinFirmaTrabajador");
   var filtroSinFirmaEncargado = document.getElementById("filtroSinFirmaEncargado");
-  var filtroSinConfirmar = document.getElementById("filtroSinConfirmar");
   var contadorPersonas = document.getElementById("contadorPersonas");
 
   // "registros_sin_firma" (las 4 firmas vacías a la vez) ya no sirve para
@@ -54,9 +53,6 @@ document.addEventListener("DOMContentLoaded", function () {
   function estaCompleto(p) {
     return !faltaAlgunaFirma(p) && (parseInt(p.total_registros) || 0) > 0;
   }
-  function faltaConfirmarEntrega(p) {
-    return (parseInt(p.registros_confirmados) || 0) < (parseInt(p.total_registros) || 0);
-  }
   // "registros_sin_firma" (las 4 firmas vacías a la vez) sigue siendo
   // exactamente lo que significa "sin ninguna firma".
   function sinNingunaFirma(p) {
@@ -73,7 +69,6 @@ document.addEventListener("DOMContentLoaded", function () {
     var soloSinNinguna = !!(filtroSinNinguna && filtroSinNinguna.checked);
     var soloSinTrabajador = !!(filtroSinFirmaTrabajador && filtroSinFirmaTrabajador.checked);
     var soloSinEncargado = !!(filtroSinFirmaEncargado && filtroSinFirmaEncargado.checked);
-    var soloSinConfirmar = !!(filtroSinConfirmar && filtroSinConfirmar.checked);
 
     todasLasPersonas = todasLasPersonasOriginal.filter(function (p) {
       var coincideTexto =
@@ -84,14 +79,12 @@ document.addEventListener("DOMContentLoaded", function () {
       var coincideSinNinguna = !soloSinNinguna || sinNingunaFirma(p);
       var coincideSinTrabajador = !soloSinTrabajador || faltaFirmaTrabajador(p);
       var coincideSinEncargado = !soloSinEncargado || faltaFirmaEncargado(p);
-      var coincideSinConfirmar = !soloSinConfirmar || faltaConfirmarEntrega(p);
 
       return (
         coincideTexto &&
         coincideSinNinguna &&
         coincideSinTrabajador &&
-        coincideSinEncargado &&
-        coincideSinConfirmar
+        coincideSinEncargado
       );
     });
 
@@ -135,7 +128,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // ── Checkboxes de firma: todos se pueden combinar entre sí (no son
   //    excluyentes) ──
-  [filtroSinNinguna, filtroSinFirmaTrabajador, filtroSinFirmaEncargado, filtroSinConfirmar].forEach(function (chk) {
+  [filtroSinNinguna, filtroSinFirmaTrabajador, filtroSinFirmaEncargado].forEach(function (chk) {
     if (chk) chk.addEventListener("change", aplicarFiltrosLocales);
   });
 
@@ -445,7 +438,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // volvía a pedir al servidor solo esa persona y la lista quedaba
     // "pegada" en ese único resultado hasta refrescar la página a mano.
     buscadorPersona.value = "";
-    [filtroSinNinguna, filtroSinFirmaTrabajador, filtroSinFirmaEncargado, filtroSinConfirmar].forEach(function (chk) {
+    [filtroSinNinguna, filtroSinFirmaTrabajador, filtroSinFirmaEncargado].forEach(function (chk) {
       if (chk) chk.checked = false;
     });
     // Recargar por si se eliminó algo
