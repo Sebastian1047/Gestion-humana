@@ -99,3 +99,5 @@
 @media(max-width:720px){.nd-periodo-balance{grid-template-columns:1fr}.nd-periodos-selector{grid-template-columns:1fr}.nd-seccion-cabecera{flex-direction:column}}
 
 #ndAccionesPeriodo[hidden] {display:none !important}
+
+.nd-periodo-panel .nd-modo-prueba{margin:8px 0 13px;font-size:.83rem;line-height:1.4;color:#166534;font-weight:600}
