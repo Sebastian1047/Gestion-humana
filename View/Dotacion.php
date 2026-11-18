@@ -19,6 +19,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
     <link rel="stylesheet" href="../CSS/variables.css" />
     <link rel="stylesheet" href="../CSS/StyleDotacion.css" />
     <link rel="stylesheet" href="../CSS/NewDotStyle.css" />
+    <link rel="stylesheet" href="../CSS/ResumenPeriodosDemo.css" />
 </head>
 
 <body>
@@ -57,6 +58,17 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                     </a>
                 </div>
 
+                <!-- Resumen opcional de movimientos del formulario unificado de prueba. -->
+                <details class="nd-resumen-inicio" id="ndResumenInicio" hidden>
+                    <summary>🗂️ Dotaciones y adelantos registrados en esta DEMO <span id="ndCantidadDemo"></span></summary>
+                    <div class="nd-resumen-tabla-wrap">
+                        <table>
+                            <thead><tr><th>Colaborador</th><th>Cuatrimestre</th><th>Estado</th><th>Movimientos</th><th>Acción</th></tr></thead>
+                            <tbody id="ndResumenTabla"></tbody>
+                        </table>
+                    </div>
+                    <p>Estos movimientos se guardaron en el navegador, no en la base de datos real. Para revisarlos o continuar un adelanto, entra a <strong>Agregar nuevo registro</strong>.</p>
+                </details>
                 <!-- Exportar masivo -->
                 <div class="exportar-wrap">
                     <div class="form-group">
@@ -328,6 +340,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
 
     <script src="../JS/ui-common.js"></script>
     <script src="../JS/Script.js"></script>
+    <script src="../JS/ResumenPeriodosDemo.js"></script>
     <script src="../JS/DotacionReportes.js"></script>
     <?php include __DIR__ . '/partials/hamburger_script.php'; ?>
 
