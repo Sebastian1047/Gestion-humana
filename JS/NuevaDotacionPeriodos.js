@@ -15,6 +15,23 @@ document.addEventListener('DOMContentLoaded', function () {
     zapatos_seguridad:'Zapatos de seguridad', zapatos:'Zapatos', botas:'Botas'
   };
   var ARTICULOS = Object.keys(CATALOGO);
+  // Grupos excluyentes en el mismo registro principal (adelanto + entrega formal).
+  var GRUPOS_EXCLUYENTES = [
+    {nombre:'Camisas', articulos:['camisa','camisa_oxford','camisa_polo']},
+    {nombre:'Prendas inferiores y overol', articulos:['pantalon','sudadera','jean','overol']},
+    {nombre:'Calzado', articulos:['zapatos_seguridad','zapatos','botas']}
+  ];
+  function grupoPrenda(id) {
+    for(var g=0;g<GRUPOS_EXCLUYENTES.length;g++) {
+      if(GRUPOS_EXCLUYENTES[g].articulos.indexOf(id)!==-1)return GRUPOS_EXCLUYENTES[g];
+    }
+    return null;
+  }
+  function prendaReservada(grupo,plan,dado) {
+    return grupo.articulos.find(function(id) {
+      return (plan[id]&&Number(plan[id].cantidad)>0)||(dado[id]||0)>0;
+    })||null;
+  }
   // Catálogo abierto: el plan se compone solo de prendas seleccionadas.
   var PLAN_EJEMPLO={camisa:{cantidad:1,talla:'M'},pantalon:{cantidad:1,talla:'32'},botas:{cantidad:1,talla:'39'}};
   var NOMBRE_PERIODO={1:'Enero – Abril',2:'Mayo – Agosto',3:'Septiembre – Diciembre'};
@@ -215,6 +232,7 @@ document.addEventListener('DOMContentLoaded', function () {
       var r=contexto(),p=r&&planPeriodo(r.codigo,registros[r.id])[id];
       total.disabled=!this.checked||this.disabled||!!p;
       bloque.classList.toggle('activa',this.checked);
+      aplicarExclusividad();
       actualizarCobertura();
     });
     total.addEventListener('input',function(){
@@ -237,6 +255,62 @@ document.addEventListener('DOMContentLoaded', function () {
   function datosEstado(ctx) {
     var base=ctx?registros[ctx.id]:null;
     return {registro:base,plan:ctx?planPeriodo(ctx.codigo,base):{},dado:entregadoPorArticulo(base)};
+  }
+  // Deshabilitar inmediatamente las alternativas del mismo grupo.
+  // Un adelanto también reserva la elección para completar ese mismo periodo.
+  function aplicarExclusividad(ctx,razon) {
+    ctx=ctx||contexto();
+    var registro=ctx?registros[ctx.id]:null;
+    var plan=ctx?planPeriodo(ctx.codigo,registro):{};
+    var dado=entregadoPorArticulo(registro);
+    var motivos={};
+    GRUPOS_EXCLUYENTES.forEach(function(grupo){
+      var elegida=prendaReservada(grupo,plan,dado);
+      // Cuando el periodo aún no contiene una elección, respetar el check actual.
+      if(!elegida)elegida=grupo.articulos.find(function(id){return $('check_'+id).checked;})||null;
+      grupo.articulos.forEach(function(id){
+        var chk=$('check_'+id),p=plan[id],previsto=p?Number(p.cantidad)||0:0;
+        var completa=!!p&&previsto>0&&(dado[id]||0)>=previsto;
+        var excluida=!!elegida&&elegida!==id;
+        var deshabilitar=!ctx||!!razon||completa||excluida;
+        if(deshabilitar&&chk.checked){
+          chk.checked=false;
+          $(id+'_talla').value='';
+          $('sexo_opuesto_'+id).checked=false;
+        }
+        chk.disabled=deshabilitar;
+        var activa=chk.checked&&!deshabilitar;
+        $(id+'_talla').disabled=!activa;
+        $('sexo_opuesto_'+id).disabled=!activa;
+        $('nd_cantidad_'+id).disabled=!activa;
+        $('nd_meta_'+id).disabled=!activa||!!p;
+        var bloque=chk.closest('.prenda-bloque');
+        bloque.classList.toggle('activa',activa);
+        bloque.classList.toggle('nd-excluida',excluida);
+        var nota=$('nd_estado_'+id);
+        if(excluida){
+          nota.textContent='No disponible: en '+grupo.nombre+' se eligió '+CATALOGO[elegida];
+        } else if(completa){
+          nota.textContent='✓ Entregado por completo ('+(dado[id]||0)+' de '+previsto+')';
+        } else if(!ctx)nota.textContent='Selecciona un colaborador';
+        else if(razon)nota.textContent='Registro no disponible para esta operación';
+        else if(p)nota.textContent='Recibidas '+(dado[id]||0)+' · faltan '+Math.max(0,previsto-(dado[id]||0))+' de '+previsto;
+        else nota.textContent='Disponible para seleccionar';
+      });
+    });
+  }
+  function validarGruposExcluyentes(ctx,articulos) {
+    var registro=registros[ctx.id],plan=planPeriodo(ctx.codigo,registro),dado=entregadoPorArticulo(registro);
+    GRUPOS_EXCLUYENTES.forEach(function(grupo){
+      var usados=grupo.articulos.filter(function(id){
+        return (plan[id]&&Number(plan[id].cantidad)>0)||(dado[id]||0)>0||
+          articulos.some(function(a){return a.id===id;});
+      });
+      if(usados.length>1){
+        throw Error('Solo se puede entregar una opción del grupo '+grupo.nombre+
+          ' por periodo. No se pueden combinar '+usados.map(function(id){return CATALOGO[id];}).join(' y ')+'.');
+      }
+    });
   }
   function pintarPrendas(ctx,razon) {
     var info=datosEstado(ctx),plan=info.plan,dado=info.dado,yaRecibidas=0;
@@ -278,6 +352,7 @@ document.addEventListener('DOMContentLoaded', function () {
       'Selecciona un colaborador para elegir libremente las prendas que necesita.';
     $('btn-guardar').disabled=!!razon||!ctx;
     $('btn-guardar').textContent=ctx&&ctx.tipo==='adelanto'?'✓ Registrar adelanto DEMO':'✓ Registrar entrega DEMO';
+    aplicarExclusividad(ctx,razon);
     actualizarCobertura();
   }
   function actualizarCobertura(){
@@ -496,6 +571,8 @@ document.addEventListener('DOMContentLoaded', function () {
       if(!p)nuevoPlan[id]={cantidad:total,talla:talla};
     });
     if(!elegidos.length)throw Error('Selecciona al menos una de las 10 prendas.');
+    // Validación independiente del estado visual para impedir combinaciones incompatibles.
+    validarGruposExcluyentes(ctx,elegidos);
     return {articulos:elegidos,nuevoPlan:nuevoPlan};
   }
   form.addEventListener('submit',function(e){
