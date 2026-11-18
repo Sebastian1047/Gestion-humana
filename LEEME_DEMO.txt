@@ -17,13 +17,25 @@ PARA REVISAR
 - Inicio, menu, preingreso y formulario de entrevista con sus pasos.
 - Dotaciones: tres personas ficticias; busqueda, filtros, detalle y formulario de edicion.
 - Nueva dotacion: buscar 'Demo' o 'DEMO001' y completar el formulario visualmente.
+- Control cuatrimestral y adelantos: abrir desde Dotaciones -> "Control cuatrimestral y adelantos · DEMO".
+  * Entregas normales solo en abril (P1), agosto (P2), diciembre (P3).
+  * Cada trabajador tiene un registro principal unico por año y cuatrimestre con historial de movimientos.
+  * Solo un adelanto del periodo siguiente y una entrega normal en el mes previsto.
+  * El adelanto parcial bloquea solo articulos/cantidades entregados; en el mes previsto permite completar faltantes.
+  * El adelanto completo cubre el periodo y bloquea una entrega normal posterior.
+  * Captura de firma del receptor (y del encargado en entregas normales).
+  * Fecha simulada para reproducir meses/años; ejemplo preconfigurado abril -> agosto de 2027.
+  * Los movimientos se guardan solo en localStorage del navegador de prueba; "Reiniciar" borra las pruebas.
+  * Este simulador NO modifica dotaciones originales ni persiste en SQL/API.
+  * Programacion de prendas/cantidades por trabajador es ficticia. Reglas de servidor e integracion real pendientes.
 - Datos de ejemplo fechados el 13 de noviembre de 2026 para filtros por fecha.
 - Equivalencias: un articulo ficticio de solo lectura.
 - Papelera vacia y pantallas de tallas/existencias.
 - Reportes: vista de ejemplo imprimible, sin reproduccion del exportador original.
 
 DESHABILITADO
-- Guardar, actualizar, confirmar entregas, eliminar, restaurar y vaciar papelera.
+- Guardar/actualizar las dotaciones originales, eliminar, restaurar y vaciar papelera.
+- El simulador de cuatrimestres SI guarda movimientos de prueba en el navegador, no en el servidor.
 - Subir/procesar archivos, comparar inventarios reales y generar archivos de produccion.
 - Recuperar o cambiar contrasenas. No hay autenticacion contra sistemas reales.
 - Conexiones a bases de datos y peticiones HTTP desde PHP.
@@ -35,7 +47,7 @@ EXCLUIDO
 - horassem.dbf y el archivo comprimido de produccion.
 
 La sesion de PHP se usa unicamente para el acceso local de demostracion.
-No se guardan formularios, firmas ni documentos. No ingresar datos personales reales.
+No se guardan formularios del sistema original ni documentos en el servidor. El simulador cuatrimestral almacena movimientos ficticios y las firmas dibujadas en el almacenamiento local del navegador; pueden borrarse con "Reiniciar". No ingresar datos personales reales.
 Los nombres, codigos, areas y articulos del ejemplo fueron inventados.
 Se conservan el nombre corporativo, logos y la estructura visible para revisar el diseno.
 Compartir solo este ZIP. No mezclar esta copia con la carpeta de produccion.
