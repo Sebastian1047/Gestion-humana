@@ -1,0 +1,70 @@
+/* Simulador de control cuatrimestral; clases aisladas del resto de Dotaciones. */
+.control-cuatri { padding-bottom: 36px; }
+.control-cuatri .cc-intro { color:#475569; margin: -6px 0 18px; font-size:.94rem; line-height:1.5; }
+.control-cuatri .cc-demo-aviso { background:#fff7e4; color:#754b00; border:1px solid #e6cb87; border-radius:10px; padding:13px 16px; margin:0 0 20px; line-height:1.45; font-size:.88rem; }
+.control-cuatri .cc-filtros { display:flex; align-items:flex-end; gap:15px; flex-wrap:wrap; }
+.control-cuatri .cc-filtro { flex:1 1 200px; min-width:180px; }
+.control-cuatri label { font-weight:600; color:#263447; }
+.control-cuatri .cc-filtro label { display:block; font-size:.86rem; margin-bottom:7px; }
+.control-cuatri .cc-botones-sim { display:flex; gap:7px; flex-wrap:wrap; align-items:center; padding-bottom:1px; }
+.control-cuatri .cc-btn { border:1px solid transparent; padding:10px 14px; border-radius:8px; font-size:.87rem; font-weight:700; cursor:pointer; transition:background-color .15s; }
+.control-cuatri .cc-btn:disabled { opacity:.48; cursor:not-allowed; }
+.control-cuatri .cc-btn-primario { background:var(--color-primario); color:white; width:100%; margin-top:17px; }
+.control-cuatri .cc-btn-primario:hover:not(:disabled) { background:var(--color-primario-hover); }
+.control-cuatri .cc-btn-outline { color:var(--color-primario); border-color:#d6a9a9; background:white; }
+.control-cuatri .cc-btn-outline:hover { background:#fff3f3; }
+.control-cuatri .cc-btn-texto { color:#64748b; background:#f1f5f9; }
+.control-cuatri .cc-resumen { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.control-cuatri .cc-periodo { border:1px solid #e2e8f0; border-radius:10px; padding:14px; background:#f8fafc; min-width:0; }
+.control-cuatri .cc-periodo.actual { border:2px solid var(--color-primario); background:#fffafa; }
+.control-cuatri .cc-periodo-topo { font-weight:750; font-size:.95rem; color:#263447; }
+.control-cuatri .cc-periodo-fechas { font-size:.78rem; color:#64748b; margin:5px 0 12px; }
+.control-cuatri .cc-estado { font-size:.82rem; font-weight:700; display:inline-block; padding:5px 9px; border-radius:6px; background:#e2e8f0; color:#334155; line-height:1.35; }
+.control-cuatri .cc-estado.completo { background:#dcfce7; color:#166534; }
+.control-cuatri .cc-estado.parcial { background:#fef3c7; color:#92400e; }
+.control-cuatri .cc-info-p { margin-top:9px; font-size:.8rem; line-height:1.4; color:#475569; }
+.control-cuatri .cc-leyenda { margin-top:13px; font-size:.84rem; color:#64748b; line-height:1.5; }
+.control-cuatri .cc-dos-columnas { display:grid; grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr); gap:19px; align-items:start; }
+.control-cuatri .cc-tipo { display:flex; gap:10px; margin-bottom:13px; flex-wrap:wrap; }
+.control-cuatri .cc-tipo label { display:flex; gap:7px; align-items:center; padding:11px 14px; border:1px solid #d9e0e8; background:#f8fafc; border-radius:8px; font-size:.86rem; cursor:pointer; }
+.control-cuatri input[type=radio],.control-cuatri input[type=checkbox] { accent-color:var(--color-primario); }
+.control-cuatri .cc-destino { background:#f8fafc; border-left:3px solid #64748b; padding:12px 14px; color:#475569; border-radius:5px; margin:0 0 12px; font-size:.85rem; line-height:1.5; }
+.control-cuatri .cc-aviso { padding:11px 13px; border-radius:7px; background:#eff6ff; color:#1e40af; font-size:.82rem; margin:0 0 13px; line-height:1.45; border:1px solid #bfdbfe; }
+.control-cuatri .cc-aviso.alerta { background:#fff7ed; color:#9a3412; border-color:#fed7aa; }
+.control-cuatri .cc-aviso.bloqueado { background:#fef2f2; color:#991b1b; border-color:#fecaca; }
+.control-cuatri .cc-subtitulo { font-weight:700; color:#334155; margin:18px 0 10px; }
+.control-cuatri .cc-prendas { display:flex; flex-direction:column; gap:8px; }
+.control-cuatri .cc-prenda { display:grid; grid-template-columns:minmax(0,1fr) 84px 76px; align-items:center; gap:8px; padding:10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; }
+.control-cuatri .cc-prenda.entregada { background:#f0fdf4; border-color:#dcfce7; }
+.control-cuatri .cc-prenda .cc-check { display:flex; gap:7px; align-items:flex-start; font-size:.82rem; min-width:0; }
+.control-cuatri .cc-prenda .cc-check span { display:block; }
+.control-cuatri .cc-prenda small { color:#64748b; display:block; font-size:.73rem; font-weight:400; margin-top:3px; }
+.control-cuatri .cc-prenda .cc-mini-label { display:block; font-size:.72rem; color:#64748b; margin-bottom:4px; font-weight:600; }
+.control-cuatri .cc-prenda input[type=text],.control-cuatri .cc-prenda input[type=number] { width:100%; min-width:0; padding:7px 6px; border:1px solid #cbd5e1; border-radius:6px; font-size:.8rem; }
+.control-cuatri .cc-sin-pendientes { background:#f0fdf4; border-radius:8px; padding:12px; color:#166534; font-size:.85rem; }
+.control-cuatri .cc-campo { margin-top:17px; }
+.control-cuatri .cc-campo label { display:block; font-size:.82rem; margin-bottom:7px; }
+.control-cuatri .cc-campo textarea { display:block; width:100%; resize:vertical; border:1px solid #cbd5e1; border-radius:8px; padding:10px; font:inherit; font-size:.87rem; line-height:1.4; }
+.control-cuatri .cc-firmas { display:grid; grid-template-columns:1fr; gap:15px; margin-top:16px; }
+.control-cuatri .cc-firma > label { font-size:.82rem; display:block; margin-bottom:7px; }
+.control-cuatri .cc-canvas-wrap { height:118px; border:1px dashed #b6c1ce; background:white; position:relative; border-radius:8px; overflow:hidden; }
+.control-cuatri .cc-canvas-wrap canvas { display:block; width:100%; height:100%; touch-action:none; cursor:crosshair; }
+.control-cuatri .cc-canvas-wrap .canvas-hint { position:absolute; left:12px; top:9px; pointer-events:none; color:#a0aec0; font-size:.74rem; }
+.control-cuatri .cc-firma-acciones { display:flex; justify-content:space-between; gap:12px; align-items:center; margin-top:6px; }
+.control-cuatri .cc-firma-acciones .cc-btn { padding:6px 8px; font-size:.74rem; }
+.control-cuatri .cc-obligatorio { color:var(--color-primario); }
+.control-cuatri #ccMensaje { font-size:.85rem; line-height:1.45; margin-top:10px; }
+.control-cuatri .cc-exito { padding:11px; border-radius:8px; background:#dcfce7; color:#166534; }
+.control-cuatri .cc-error { padding:11px; border-radius:8px; background:#fef2f2; color:#991b1b; }
+.control-cuatri .cc-registro { border:1px solid #e2e8f0; padding:12px; border-radius:9px; margin-bottom:12px; background:white; }
+.control-cuatri .cc-registro h4 { font-size:.89rem; color:#334155; margin:0 0 7px; }
+.control-cuatri .cc-registro p { font-size:.8rem; line-height:1.5; color:#475569; margin:6px 0; }
+.control-cuatri .cc-movimiento { margin-top:9px; border-top:1px solid #e2e8f0; padding-top:11px; font-size:.8rem; color:#334155; }
+.control-cuatri .cc-movimiento strong { font-size:.84rem; }
+.control-cuatri .cc-movimiento ul { padding-left:21px; margin:5px 0; line-height:1.5; }
+.control-cuatri .cc-firma-ver { margin-top:7px; padding:5px; border:1px solid #e2e8f0; border-radius:6px; max-height:75px; max-width:160px; background:#fff; }
+.control-cuatri .cc-vacio { background:#f8fafc; color:#64748b; padding:13px; border-radius:8px; font-size:.85rem; line-height:1.5; }
+.control-cuatri .cc-volver { padding:0 0 22px; }
+.control-cuatri .cc-volver a { color:var(--color-primario); font-weight:600; text-decoration:none; }
+@media (max-width:1050px) { .control-cuatri .cc-dos-columnas { grid-template-columns:1fr; } }
+@media (max-width:760px) { .control-cuatri .cc-resumen { grid-template-columns:1fr; } .control-cuatri .cc-filtros { align-items:stretch; } .control-cuatri .cc-filtro { flex-basis:100%; } .control-cuatri .cc-prenda { grid-template-columns:minmax(0,1fr) 70px 65px; } }
