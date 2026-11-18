@@ -1,0 +1,44 @@
+/* Formulario integrado de Nueva Dotación + reglas cuatrimestrales (DEMO).
+   Estilos aislados: no altera el resto del módulo. */
+.nd-demo-aviso {background:#fff7e4;border:1px solid #e5c878;border-radius:9px;padding:13px 16px;margin:0 0 17px;color:#78521b;font-size:.85rem;line-height:1.5}
+.nd-periodo-panel .nd-dos-col {display:grid;grid-template-columns:minmax(230px,.85fr) minmax(250px,1.15fr);gap:18px;align-items:start}
+.nd-label {display:block;font-size:.86rem;font-weight:750;color:#334155;margin-bottom:8px}
+.nd-tipos {display:flex;gap:9px;flex-wrap:wrap}
+.nd-tipos label {display:flex;align-items:center;gap:8px;padding:11px 14px;border:1px solid #d6dde5;border-radius:9px;background:#f8fafc;font-size:.86rem;font-weight:600;cursor:pointer;color:#263447}
+.nd-tipos input {accent-color:var(--color-primario)}
+.nd-destino {min-height:59px;border-left:4px solid #780606;background:#f8fafc;padding:12px 14px;border-radius:6px;color:#334155;font-size:.86rem;line-height:1.48}
+.nd-hint {font-size:.82rem;line-height:1.5;color:#64748b;margin:11px 0 0}
+.nd-periodo-panel .cc-resumen {margin-top:6px}
+.nd-periodo-panel .cc-periodo {padding:11px 12px}
+.nd-aviso {background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;border-radius:8px;padding:11px 14px;margin-top:12px;font-size:.85rem;line-height:1.5}
+.nd-aviso.bloqueo {background:#fef2f2;color:#991b1b;border-color:#fecaca}
+.nd-aviso.adelanto {background:#f0fdf4;color:#166534;border-color:#bbf7d0}
+.nd-concepto {margin-top:16px}
+.nd-concepto label {font-size:.86rem;font-weight:700;color:#334155;display:block;margin-bottom:7px}
+.nd-concepto textarea {width:100%;border:1px solid #cbd5e1;padding:10px 12px;border-radius:8px;font:inherit;font-size:.88rem;resize:vertical;line-height:1.4}
+.nd-historial-panel #ndHistorial {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:start}
+.nd-periodo-historial {background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:13px;min-width:0}
+.nd-periodo-historial h4 {font-size:.9rem;color:#263447;margin:0 0 8px}
+.nd-periodo-historial .nd-subdato {font-size:.8rem;color:#64748b;line-height:1.4;margin:6px 0}
+.nd-mov {border-top:1px solid #e2e8f0;margin-top:11px;padding-top:10px;font-size:.81rem;color:#334155;line-height:1.45}
+.nd-mov strong {display:block;margin-bottom:5px}
+.nd-mov ul {padding-left:18px;margin:5px 0}
+.nd-mov details {margin:6px 0}
+.nd-mov details summary {cursor:pointer;color:#780606;font-weight:600}
+.nd-mov img {max-width:180px;max-height:80px;border:1px solid #cbd5e1;background:white;border-radius:5px;margin:5px 0}
+.nd-vacio {padding:12px;background:#f8fafc;border-radius:8px;color:#64748b;font-size:.86rem;grid-column:1/-1}
+.nd-prendas-instruccion {background:#f8fafc;border-radius:8px;padding:12px 14px;margin:-4px 0 15px;font-size:.84rem;line-height:1.5;color:#475569}
+.prenda-bloque.nd-no-programada {opacity:.48;filter:grayscale(.35)}
+.prenda-bloque.nd-ya-entregada {border-color:#bbf7d0;background:#f0fdf4}
+.prenda-bloque .nd-item-estado {font-size:.72rem;line-height:1.3;margin:6px 0 0;color:#64748b;min-height:1.7em}
+.prenda-bloque.nd-ya-entregada .nd-item-estado {color:#166534;font-weight:700}
+.prenda-bloque .nd-cantidad-wrap {display:flex;align-items:center;gap:6px;margin-top:7px}
+.prenda-bloque .nd-cantidad-wrap label {font-size:.74rem;color:#64748b;font-weight:600}
+.prenda-bloque .nd-cantidad-wrap input {border:1px solid #cbd5e1;border-radius:6px;padding:5px;width:62px;max-width:100%;font-size:.8rem}
+.prenda-bloque .nd-cantidad-wrap input:disabled {background:#f1f5f9}
+#mensaje-resultado.nd-resultado {display:block;margin:14px 0;padding:12px 14px;border-radius:8px;font-size:.87rem;line-height:1.45}
+#mensaje-resultado.nd-resultado.ok {background:#dcfce7;color:#166534;border:1px solid #bbf7d0}
+#mensaje-resultado.nd-resultado.error {background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
+.nd-periodo-panel .cc-estado {white-space:normal}
+@media(max-width:1100px){.nd-historial-panel #ndHistorial {grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:770px){.nd-periodo-panel .nd-dos-col{grid-template-columns:1fr}.nd-historial-panel #ndHistorial{grid-template-columns:1fr}.nd-periodo-panel .cc-resumen{grid-template-columns:1fr}}
