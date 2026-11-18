@@ -198,13 +198,32 @@ document.addEventListener('DOMContentLoaded', function () {
     input.className='nd-cantidad';input.id='nd_cantidad_'+id;
     label.appendChild(input);cant.appendChild(label);
     bloque.appendChild(cant);
+    var programada=document.createElement('div');
+    programada.className='nd-cantidad-wrap nd-meta-wrap';
+    var etiqueta=document.createElement('label');
+    etiqueta.textContent='Total previsto';
+    var total=document.createElement('input');
+    total.type='number';total.min='1';total.max='99';total.value='1';
+    total.className='nd-meta';total.id='nd_meta_'+id;
+    etiqueta.appendChild(total);programada.appendChild(etiqueta);bloque.appendChild(programada);
     var nota=document.createElement('div');nota.className='nd-item-estado';nota.id='nd_estado_'+id;bloque.appendChild(nota);
     checkbox.addEventListener('change',function(){
       select.disabled=!this.checked||this.disabled;
       if(!this.checked)select.value='';
       if(sexo){sexo.disabled=!this.checked||this.disabled;if(!this.checked)sexo.checked=false;}
       input.disabled=!this.checked||this.disabled;
+      var r=contexto(),p=r&&planPeriodo(r.codigo,registros[r.id])[id];
+      total.disabled=!this.checked||this.disabled||!!p;
       bloque.classList.toggle('activa',this.checked);
+      actualizarCobertura();
+    });
+    total.addEventListener('input',function(){
+      var r=contexto(),p=r&&planPeriodo(r.codigo,registros[r.id])[id],d=entregadoPorArticulo(r&&registros[r.id]);
+      var max=p?Math.max(0,Number(p.cantidad)-(d[id]||0)):Number(total.value);
+      if(Number.isInteger(max)&&max>0){
+        input.max=String(max);
+        if(Number(input.value)>max)input.value=String(max);
+      }
       actualizarCobertura();
     });
     input.addEventListener('input',actualizarCobertura);
@@ -220,38 +239,43 @@ document.addEventListener('DOMContentLoaded', function () {
     return {registro:base,plan:ctx?planPeriodo(ctx.codigo,base):{},dado:entregadoPorArticulo(base)};
   }
   function pintarPrendas(ctx,razon) {
-    var info=datosEstado(ctx),plan=info.plan,dado=info.dado;
-    var pendientes=0,programadas=0;
+    var info=datosEstado(ctx),plan=info.plan,dado=info.dado,yaRecibidas=0;
     ARTICULOS.forEach(function(id){
-      var checkbox=$('check_'+id),select=$(id+'_talla'),sexo=$('sexo_opuesto_'+id),bloque=checkbox.closest('.prenda-bloque');
-      var cant=$('nd_cantidad_'+id),nota=$('nd_estado_'+id),p=plan[id];
-      var previsto=p?Number(p.cantidad)||0:0;
-      var ya=Math.min(previsto,dado[id]||0),restante=Math.max(0,previsto-ya);
-      if(previsto){programadas++;if(restante)pendientes++;}
-      var habilitado=!!ctx&&!razon&&restante>0;
+      var checkbox=$('check_'+id),select=$(id+'_talla'),sexo=$('sexo_opuesto_'+id),
+        bloque=checkbox.closest('.prenda-bloque');
+      var cant=$('nd_cantidad_'+id),meta=$('nd_meta_'+id),nota=$('nd_estado_'+id),p=plan[id];
+      var previsto=p?Number(p.cantidad)||0:0,dados=dado[id]||0;
+      var restante=p?Math.max(0,previsto-dados):1;
+      var completo=!!p&&previsto>0&&dados>=previsto;
+      var habilitado=!!ctx&&!razon&&!completo;
+      if(completo)yaRecibidas++;
       checkbox.disabled=!habilitado;
-      checkbox.checked=habilitado&&ctx.tipo==='normal';
+      // En entrega normal preseleccionar solo prendas con unidades pendientes
+      // que ya estaban programadas en un adelanto; otras son opcionales.
+      checkbox.checked=habilitado&&!!p&&restante>0&&ctx.tipo==='normal';
       select.disabled=!checkbox.checked;
-      sexo.disabled=!checkbox.checked;
-      sexo.checked=false;
+      sexo.disabled=!checkbox.checked;sexo.checked=false;
       cant.disabled=!checkbox.checked;
-      cant.max=String(restante||1);
-      cant.value=String(restante||1);
-      if(checkbox.checked && p){
+      cant.max=String(restante);
+      cant.value=String(ctx&&ctx.tipo==='normal'&&p?restante:1);
+      meta.value=String(p?previsto:1);
+      meta.disabled=!checkbox.checked||!!p;
+      if(checkbox.checked&&p){
         var opt=Array.prototype.find.call(select.options,function(o){return o.value===p.talla;});
         select.value=opt?p.talla:'';
-      } else select.value='';
+      }else select.value='';
       bloque.classList.toggle('activa',checkbox.checked);
-      bloque.classList.toggle('nd-no-programada',!p);
-      bloque.classList.toggle('nd-ya-entregada',previsto>0&&restante===0);
+      bloque.classList.toggle('nd-no-programada',false);
+      bloque.classList.toggle('nd-ya-entregada',completo);
       nota.textContent=!ctx?'Selecciona un colaborador':
-        !p?'No programada (DEMO)':restante===0?'✓ Ya entregado: '+ya+' de '+previsto:
-        'Pendientes: '+restante+' de '+previsto;
+        completo?'✓ Ya entregadas '+dados+' de '+previsto+' · bloqueada':
+        p?'Recibidas '+dados+' · faltan '+restante+' de '+previsto:
+        'Disponible para seleccionar';
     });
-    $('ndPlanDescripcion').textContent=ctx ?
-      'Plan ficticio de '+$('nombre').value+': '+programadas+' prendas programadas, '+pendientes+
-      ' con cantidades pendientes. Las prendas no programadas o ya entregadas están bloqueadas.' :
-      'Selecciona un colaborador para ver las prendas que corresponden a su dotación de prueba.';
+    $('ndPlanDescripcion').textContent=ctx?
+      'Puedes seleccionar cualquiera de las 10 prendas, con talla, cantidad a entregar y total previsto. Si adelantas menos de lo previsto, la diferencia quedará pendiente. '+yaRecibidas+
+      ' prendas ya completadas están bloqueadas.':
+      'Selecciona un colaborador para elegir libremente las prendas que necesita.';
     $('btn-guardar').disabled=!!razon||!ctx;
     $('btn-guardar').textContent=ctx&&ctx.tipo==='adelanto'?'✓ Registrar adelanto DEMO':'✓ Registrar entrega DEMO';
     actualizarCobertura();
@@ -259,19 +283,16 @@ document.addEventListener('DOMContentLoaded', function () {
   function actualizarCobertura(){
     var ctx=contexto();
     if(!ctx)return;
-    var p=planPeriodo(ctx.codigo,registros[ctx.id]),d=entregadoPorArticulo(registros[ctx.id]);
-    var pendienteTotal=0,seleccion=0;
-    Object.keys(p).forEach(function(id){
-      pendienteTotal+=Math.max(0,Number(p[id].cantidad)-(d[id]||0));
-      if($('check_'+id).checked)seleccion+=Number($('nd_cantidad_'+id).value)||0;
-    });
-    var nota=ctx.tipo==='adelanto'?(seleccion===0?'Selecciona las prendas a adelantar':
-      seleccion>=pendienteTotal?'Adelanto completo':'Adelanto parcial'):'Entrega normal (solo artículos pendientes)';
-    var bloque=$('ndAviso');
-    var texto=bloque.getAttribute('data-aviso')||'';
-    var clase=bloque.getAttribute('data-clase')||'';
+    var seleccion=0;
+    ARTICULOS.forEach(function(id){if($('check_'+id).checked)seleccion+=Number($('nd_cantidad_'+id).value)||0;});
+    var modalidad=ctx.tipo==='adelanto'?
+      (form.querySelector('input[name="nd_modalidad"]:checked')||{}).value:'';
+    var nota=ctx.tipo==='adelanto'?
+      ('Adelanto '+(modalidad==='completo'?'completo (cierra el periodo)':'parcial (permite completar después)')):
+      'Entrega normal (cierra el periodo con los artículos seleccionados y pendientes)';
+    var bloque=$('ndAviso'),texto=bloque.getAttribute('data-aviso')||'',clase=bloque.getAttribute('data-clase')||'';
     bloque.className='nd-aviso '+clase;
-    bloque.textContent=(texto?texto+' ':'')+'Modalidad: '+nota+'.';
+    bloque.textContent=(texto?texto+' ':'')+'Modalidad: '+nota+'. Unidades seleccionadas: '+seleccion+'.';
   }
   function renderResumen(ctx) {
     var f=fechaValida(hoy.value),anio=Number(anioConsulta.value);
