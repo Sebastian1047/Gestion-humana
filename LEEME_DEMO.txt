@@ -17,6 +17,12 @@ PARA REVISAR
 - Inicio, menu, preingreso y formulario de entrevista con sus pasos.
 - Dotaciones: tres personas ficticias; busqueda, filtros, detalle y formulario de edicion. Los registros creados en el nuevo formulario integrado se listan por separado en "Dotaciones y adelantos registrados en esta DEMO", sin modificar los registros originales.
 - Nueva dotacion: desde "Agregar nuevo registro", buscar 'Demo' o 'DEMO001' y probar el formulario integrado con control cuatrimestral, adelantos parciales/completos, prendas y tallas originales, firmas y registro principal con historial. Los movimientos se almacenan en localStorage y comparten datos con el simulador de control cuatrimestral. El backend real sigue bloqueado en DEMO.
+  * Nuevo flujo: primero seleccionar colaborador y año, después pulsar la tarjeta Periodo 1 / 2 / 3.
+  * Al entrar en un periodo se ve su registro principal, prendas ya entregadas, pendientes e historial de movimientos.
+  * El formulario de prendas y firmas se abre solo al pulsar "Registrar entrega normal" o "Registrar adelanto" si la fecha lo permite.
+  * Al guardar se vuelve al detalle del mismo periodo y se bloquea una segunda entrega o adelanto duplicado.
+  * Se puede cambiar el año para revisar otros periodos, incluido P1 del año siguiente para adelantar desde P3.
+
 - Control cuatrimestral y adelantos: abrir desde Dotaciones -> "Control cuatrimestral y adelantos · DEMO".
   * Entregas normales solo en abril (P1), agosto (P2), diciembre (P3).
   * Cada trabajador tiene un registro principal unico por año y cuatrimestre con historial de movimientos.
