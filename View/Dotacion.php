@@ -47,9 +47,6 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                     <button class="nuevoregistro" id="btnNuevoRegistro">
                         + Agregar nuevo registro
                     </button>
-                    <a href="ControlCuatrimestral.php" class="btn-informe-dotaciones" style="background:#780606;color:white;text-decoration:none;">
-                        🗓️ Control cuatrimestral y adelantos · DEMO
-                    </a>
 
                     <button class="btn-informe-dotaciones" id="btnInformeDotaciones">
                         📄 Informe Dotaciones
