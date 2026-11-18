@@ -330,7 +330,7 @@ document.addEventListener('DOMContentLoaded', function () {
       var firma=m.firmaTrabajador&&/^data:image\/(jpeg|png);base64,[A-Za-z0-9+/=]+$/.test(m.firmaTrabajador)
         ? '<details><summary>Ver firma de quien recibe</summary><img alt="Firma de quien recibe" src="'+m.firmaTrabajador+'"></details>'
         : '<small>Ejemplo sin firma disponible</small>';
-      return '<div class="nd-mov"><strong>Movimiento '+(i+1)+' · '+(m.tipo==='adelanto'?'Adelanto':'Entrega normal')+
+      return '<div class="nd-mov"><strong>Movimiento '+(i+1)+' · '+(m.tipo==='adelanto'?'Adelanto '+(m.modalidad==='completo'?'completo':'parcial'):'Entrega normal')+
         ' · '+formatoFecha(m.fecha)+'</strong><p>'+escapeHtml(m.concepto||'Sin concepto')+'</p>'+
         '<ul>'+items+'</ul>'+firma+'</div>';
     }).join('');
@@ -426,6 +426,7 @@ document.addEventListener('DOMContentLoaded', function () {
             : 'Solo se registrarán las prendas pendientes del mismo periodo.'));
         aviso.setAttribute('data-clase',razon?'bloqueo':modoRegistro==='adelanto'?'adelanto':'');
         $('ndEncargadoBloque').style.display=modoRegistro==='adelanto'?'none':'';
+        $('ndModalidadAdelanto').hidden=modoRegistro!=='adelanto';
         $('ndTextoFirmas').textContent=modoRegistro==='adelanto'
           ? 'Adelanto: firma de quien recibe. No se pide una segunda confirmación.'
           : 'Entrega formal: firma del trabajador y del encargado, una única vez.';
@@ -458,32 +459,44 @@ document.addEventListener('DOMContentLoaded', function () {
   $('ndCancelarMovimiento').addEventListener('click',cerrarMovimiento);
   $('ndAccionNormal').addEventListener('click',function(){abrirMovimiento('normal');});
   $('ndAccionAdelanto').addEventListener('click',function(){abrirMovimiento('adelanto');});
+  Array.prototype.forEach.call(form.querySelectorAll('input[name="nd_modalidad"]'),function(radio){
+    radio.addEventListener('change',actualizarCobertura);
+  });
   hoy.addEventListener('change',function(){
     if(!periodoActivo){var f=fechaValida(hoy.value);if(f)anioConsulta.value=f.anio;}
     modoRegistro=null;
     render(true);
   });
-  function recogerArticulos(ctx,r){
-    var plan=planPeriodo(ctx.codigo,r),entregados=entregadoPorArticulo(r);
-    var elegidos=[],cantidadTotal=0,pendienteTotal=0;
-    Object.keys(plan).forEach(function(id){
-      var max=Number(plan[id].cantidad)-(entregados[id]||0);
-      if(max<=0)return;
-      pendienteTotal+=max;
+  function recogerArticulos(ctx,r) {
+    var plan=planPeriodo(ctx.codigo,r),entregados=entregadoPorArticulo(r),
+      elegidos=[],nuevoPlan={},modalidad=(form.querySelector('input[name="nd_modalidad"]:checked')||{}).value||'parcial';
+    ARTICULOS.forEach(function(id){
+      var p=plan[id],dados=entregados[id]||0,pendiente=p?Number(p.cantidad)-dados:0;
       var chk=$('check_'+id);
-      if(!chk.checked)return;
-      if(chk.disabled)throw Error('La prenda '+CATALOGO[id]+' está bloqueada.');
-      var cantidad=Number($('nd_cantidad_'+id).value),talla=$(id+'_talla').value;
+      if(!chk.checked){
+        if(ctx.tipo==='normal'&&p&&pendiente>0)
+          throw Error('Falta completar '+CATALOGO[id]+': '+pendiente+' unidades programadas.');
+        if(ctx.tipo==='adelanto'&&modalidad==='completo'&&p&&pendiente>0)
+          throw Error('El adelanto completo debe cubrir lo pendiente de '+CATALOGO[id]+'.');
+        return;
+      }
+      if(chk.disabled)throw Error(CATALOGO[id]+' ya está entregada completamente.');
+      var cantidad=Number($('nd_cantidad_'+id).value),
+        total=p?Number(p.cantidad):Number($('nd_meta_'+id).value),
+        talla=$(id+'_talla').value;
+      if(!Number.isInteger(total)||total<1||total>99||total<dados)
+        throw Error('El total previsto de '+CATALOGO[id]+' debe estar entre 1 y 99.');
+      var max=total-dados;
       if(!Number.isInteger(cantidad)||cantidad<1||cantidad>max)
-        throw Error('La cantidad de '+CATALOGO[id]+' no puede superar lo pendiente ('+max+').');
-      if(!talla)throw Error('Selecciona una talla para '+CATALOGO[id]+'.');
+        throw Error('Cantidad inválida para '+CATALOGO[id]+'. Puedes entregar hasta '+max+' de '+total+'.');
+      if(!talla)throw Error('Selecciona talla de '+CATALOGO[id]+'.');
+      if((ctx.tipo==='normal'||(ctx.tipo==='adelanto'&&modalidad==='completo'))&&cantidad!==max)
+        throw Error('Para cerrar el periodo debes entregar las '+max+' unidades pendientes de '+CATALOGO[id]+'.');
       elegidos.push({id:id,cantidad:cantidad,talla:talla,genero:generoPrenda(id)});
-      cantidadTotal+=cantidad;
+      if(!p)nuevoPlan[id]={cantidad:total,talla:talla};
     });
-    if(!elegidos.length)throw Error('Selecciona al menos una prenda pendiente.');
-    if(ctx.tipo==='normal'&&cantidadTotal!==pendienteTotal)
-      throw Error('La entrega normal debe completar todas las prendas pendientes del periodo. Selecciona los artículos faltantes.');
-    return elegidos;
+    if(!elegidos.length)throw Error('Selecciona al menos una de las 10 prendas.');
+    return {articulos:elegidos,nuevoPlan:nuevoPlan};
   }
   form.addEventListener('submit',function(e){
     e.preventDefault();
@@ -498,13 +511,15 @@ document.addEventListener('DOMContentLoaded', function () {
       if(!concepto)throw Error('Escribe el concepto de la entrega o adelanto.');
       if(!firmaTrabajador)throw Error('El colaborador debe firmar que recibió las prendas.');
       if(ctx.tipo==='normal'&&!firmaEncargado)throw Error('La entrega normal también requiere la firma del encargado.');
-      var articulos=recogerArticulos(ctx,registros[ctx.id]);
+      var recogido=recogerArticulos(ctx,registros[ctx.id]);
       var original=registros[ctx.id];
       var nuevo=original?JSON.parse(JSON.stringify(original)):{
         codigo:ctx.codigo,anio:ctx.anio,periodo:ctx.periodo,plan:planBase(ctx.codigo),movimientos:[]
       };
+      nuevo.plan=Object.assign({},nuevo.plan||{},recogido.nuevoPlan);
       var movimiento={
-        tipo:ctx.tipo,fecha:ctx.fecha.fecha,concepto:concepto,articulos:articulos,
+        tipo:ctx.tipo,modalidad:ctx.tipo==='adelanto'?(form.querySelector('input[name="nd_modalidad"]:checked')||{}).value||'parcial':'normal',
+        fecha:ctx.fecha.fecha,concepto:concepto,articulos:recogido.articulos,
         firmaTrabajador:firmaTrabajador,firmaEncargado:ctx.tipo==='normal'?firmaEncargado:null,
         nombreTrabajador:$('nombre').value,centroCostos:$('cargo').value,
         genero:genero,cambioCarnet:(form.querySelector('input[name="cambio_carnet_deterioro"]:checked')||{}).value||'',
@@ -528,14 +543,14 @@ document.addEventListener('DOMContentLoaded', function () {
   $('ndCargarEjemplo').addEventListener('click',function(){
     var codigo='DEMO001',id1=clave(codigo,2027,1),id2=clave(codigo,2027,2);
     if((registros[id1]||registros[id2])&&!window.confirm('Este ejemplo reemplazará las dotaciones ficticias P1 y P2 de DEMO001 en 2027. ¿Continuar?'))return;
-    var plan=planBase(codigo),previo1=registros[id1],previo2=registros[id2];
-    registros[id1]={codigo:codigo,anio:2027,periodo:1,plan:planBase(codigo),movimientos:[{
+    var plan=JSON.parse(JSON.stringify(PLAN_EJEMPLO)),previo1=registros[id1],previo2=registros[id2];
+    registros[id1]={codigo:codigo,anio:2027,periodo:1,plan:JSON.parse(JSON.stringify(plan)),movimientos:[{
       tipo:'normal',fecha:'2027-04-10',concepto:'Entrega de abril (caso de prueba)',
       articulos:Object.keys(plan).map(function(id){return {id:id,cantidad:plan[id].cantidad,talla:plan[id].talla};}),
       firmaTrabajador:null,firmaEncargado:null
     }]};
-    registros[id2]={codigo:codigo,anio:2027,periodo:2,plan:planBase(codigo),movimientos:[{
-      tipo:'adelanto',fecha:'2027-04-20',concepto:'Cambio de labor: adelanto de botas para agosto (caso de prueba)',
+    registros[id2]={codigo:codigo,anio:2027,periodo:2,plan:JSON.parse(JSON.stringify(plan)),movimientos:[{
+      tipo:'adelanto',modalidad:'parcial',fecha:'2027-04-20',concepto:'Cambio de labor: adelanto de botas para agosto (caso de prueba)',
       articulos:[{id:'botas',cantidad:1,talla:'39'}],firmaTrabajador:null,firmaEncargado:null
     }]};
     if(!guardarLocal()){
