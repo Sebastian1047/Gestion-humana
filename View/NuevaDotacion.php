@@ -20,6 +20,8 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
     <link rel="stylesheet" href="../CSS/variables.css" />
     <link rel="stylesheet" href="../CSS/StyleDotacion.css" />
     <link rel="stylesheet" href="../CSS/NewDotStyle.css" />
+    <link rel="stylesheet" href="../CSS/ControlCuatrimestral.css" />
+    <link rel="stylesheet" href="../CSS/NuevaDotacionPeriodos.css" />
 
 </head>
 
@@ -46,10 +48,8 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                     <h2>Nueva Dotación</h2>
                 </div>
 
-                <div style="background:#fff7e6;border:1px solid #e7c784;border-radius:9px;padding:13px 16px;margin:0 0 18px;color:#704800;font-size:0.88rem;line-height:1.55;">
-                    <strong>Control cuatrimestral en demostración:</strong> para probar abril, agosto, diciembre y los adelantos parciales o completos,
-                    <a href="ControlCuatrimestral.php" style="color:#780606;font-weight:700;">abre el simulador de dotaciones</a>.
-                    Este formulario original continúa sin permitir guardar en la DEMO.
+                <div class="nd-demo-aviso"><strong>DEMO · Formulario integrado.</strong>
+                    Prueba entregas cuatrimestrales y adelantos con datos ficticios. Los movimientos de esta pantalla se guardan solamente en este navegador, sin modificar registros ni servicios reales.
                 </div>
                 <!-- Mensaje resultado -->
                 <div id="mensaje-resultado" class="mensaje-oculto"></div>
@@ -126,9 +126,38 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                         </fieldset>
                     </div>
 
+                    <!-- ========== CONTROL POR PERIODO Y ADELANTOS ========== -->
+                    <section class="card-seccion nd-periodo-panel" aria-labelledby="nd-titulo-control">
+                        <h3 class="seccion-titulo" id="nd-titulo-control">Control de dotación por cuatrimestre</h3>
+                        <div class="nd-dos-col">
+                            <div>
+                                <label class="nd-label">Tipo de movimiento</label>
+                                <div class="nd-tipos">
+                                    <label><input type="radio" name="nd_tipo" value="normal" checked> Entrega normal</label>
+                                    <label><input type="radio" name="nd_tipo" value="adelanto"> Adelanto de dotación</label>
+                                </div>
+                            </div>
+                            <div class="nd-destino" id="ndDestino" aria-live="polite">Selecciona un trabajador y una fecha para consultar el periodo.</div>
+                        </div>
+                        <div id="ndAviso" role="status" aria-live="polite"></div>
+                        <div class="nd-label" style="margin:15px 0 9px;">Estado de las tres dotaciones del año</div>
+                        <div class="cc-resumen" id="ndResumen" aria-live="polite"></div>
+                        <div class="nd-concepto">
+                            <label for="ndConcepto">Concepto de la entrega o adelanto <span class="requerido">*</span></label>
+                            <textarea id="ndConcepto" rows="2" maxlength="400" placeholder="Ej. Entrega ordinaria de agosto, cambio de labor..."></textarea>
+                        </div>
+                        <p class="nd-hint">Abril: periodo 1 · Agosto: periodo 2 · Diciembre: periodo 3. Solo se puede adelantar el periodo siguiente. El adelanto puede ser parcial o completo según las prendas seleccionadas.</p>
+                    </section>
+
+                    <section class="card-seccion nd-historial-panel" aria-labelledby="nd-titulo-historial">
+                        <h3 class="seccion-titulo" id="nd-titulo-historial">Registro principal e historial de movimientos</h3>
+                        <div id="ndHistorial" aria-live="polite"><p class="nd-vacio">Selecciona un colaborador para ver las prendas adelantadas y los movimientos del periodo.</p></div>
+                    </section>
+
                     <!-- ========== PRENDAS ENTREGADAS ========== -->
                     <div class="card-seccion">
-                        <h3 class="seccion-titulo">Prendas Entregadas</h3>
+                        <h3 class="seccion-titulo">Prendas entregadas <small style="font-size:.78rem;font-weight:500;color:#64748b;">(se bloquean los artículos ya recibidos)</small></h3>
+                        <p class="nd-prendas-instruccion" id="ndPlanDescripcion">Selecciona un colaborador para ver las prendas que corresponden a su dotación de prueba.</p>
 
                         <!-- Grupo: Ropa de trabajo -->
                         <p class="prendas-grupo-label">🧥 Ropa de trabajo</p>
@@ -491,6 +520,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                     <!-- ========== FIRMAS ========== -->
                     <div class="card-seccion">
                         <h3 class="seccion-titulo">Firmas</h3>
+                        <p class="nd-hint" id="ndTextoFirmas">Entrega normal: firmas del colaborador y encargado. Adelanto: firma de quien recibe.</p>
 
                         <div class="firmas-grid">
 
@@ -511,7 +541,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                             </div>
 
                             <!-- Firma Encargado -->
-                            <div class="firma-bloque">
+                            <div class="firma-bloque" id="ndEncargadoBloque">
                                 <label class="firma-label">Firma del Encargado</label>
                                 <div class="canvas-wrap" id="wrap_encargado">
                                     <canvas id="canvas_encargado"></canvas>
@@ -550,7 +580,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                     <!-- ========== BOTONES ========== -->
                     <div class="botones-wrap">
                         <button type="submit" class="btn btn-guardar" id="btn-guardar">
-                            &#10003; Guardar Dotación
+                            &#10003; Registrar movimiento DEMO
                         </button>
                         <a href="Dotacion.php" class="btn btn-cancelar">
                             &#10005; Cancelar
@@ -565,7 +595,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
 
     <script src="../JS/ui-common.js"></script>
     <script src="../JS/firma-canvas.js"></script>
-    <script src="../JS/NuevaDotacion.js?v=20260818a"></script>
+    <script src="../JS/NuevaDotacionPeriodos.js?v=20261118a"></script>
     <script src="../JS/Script.js"></script>
     <?php include __DIR__ . '/partials/hamburger_script.php'; ?>
 
