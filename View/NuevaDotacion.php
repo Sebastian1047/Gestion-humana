@@ -46,6 +46,11 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                     <h2>Nueva Dotación</h2>
                 </div>
 
+                <div style="background:#fff7e6;border:1px solid #e7c784;border-radius:9px;padding:13px 16px;margin:0 0 18px;color:#704800;font-size:0.88rem;line-height:1.55;">
+                    <strong>Control cuatrimestral en demostración:</strong> para probar abril, agosto, diciembre y los adelantos parciales o completos,
+                    <a href="ControlCuatrimestral.php" style="color:#780606;font-weight:700;">abre el simulador de dotaciones</a>.
+                    Este formulario original continúa sin permitir guardar en la DEMO.
+                </div>
                 <!-- Mensaje resultado -->
                 <div id="mensaje-resultado" class="mensaje-oculto"></div>
 
