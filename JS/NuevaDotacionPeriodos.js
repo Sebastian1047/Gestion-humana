@@ -27,6 +27,10 @@ document.addEventListener('DOMContentLoaded', function () {
   var firmaTrabajador=null, firmaEncargado=null;
   var timeoutBusqueda=null;
   var hoy=$('fecha_entrega');
+  var periodoActivo=null;     // Solo se muestra el detalle del periodo elegido.
+  var modoRegistro=null;      // null=consulta, normal=entrega, adelanto=adelanto.
+  var anioConsulta=$('ndAnioConsulta');
+  anioConsulta.value=(fechaValida(hoy.value)||{anio:new Date().getFullYear()}).anio;
 
   function escapeHtml(str) {
     return String(str==null?'':str).replace(/[&<>"']/g,function(x){
@@ -82,16 +86,22 @@ document.addEventListener('DOMContentLoaded', function () {
     return {nombre:soloAdelanto&&fechaEnMes<inicio?'Adelantado parcialmente':'Pendiente de completar',clase:'parcial',detalle:p.entregado+' de '+p.previsto+' artículos entregados'};
   }
   function contexto() {
-    var codigo=$('codigo').value.trim(),fecha=fechaValida(hoy.value),seleccion=form.querySelector('input[name="nd_tipo"]:checked');
-    if(!codigo||!fecha||!seleccion)return null;
-    var tipo=seleccion.value,destino=tipo==='adelanto'?siguiente(fecha):{anio:fecha.anio,periodo:fecha.periodo};
-    return {codigo:codigo,fecha:fecha,tipo:tipo,anio:destino.anio,periodo:destino.periodo,id:clave(codigo,destino.anio,destino.periodo)};
+    var codigo=$('codigo').value.trim(),fecha=fechaValida(hoy.value);
+    var anio=Number(anioConsulta.value);
+    if(!codigo||!fecha||!periodoActivo||!Number.isInteger(anio)||anio<2020||anio>2100)return null;
+    return {codigo:codigo,fecha:fecha,tipo:modoRegistro||'normal',anio:anio,periodo:periodoActivo,
+      id:clave(codigo,anio,periodoActivo)};
   }
   function motivoBloqueo(ctx,r) {
-    if(!ctx) return 'Selecciona un trabajador y una fecha válida para continuar.';
+    if(!ctx)return 'Selecciona trabajador, periodo y fecha válida para continuar.';
     var ms=movimientos(r);
-    if(ctx.tipo==='normal' && ctx.fecha.mes!==ctx.periodo*4)
-      return 'Las entregas normales del periodo '+ctx.periodo+' se realizan en '+ENTREGA_MES[ctx.periodo]+'. Puedes cambiar la fecha para probar ese mes.';
+    if(ctx.tipo==='normal' && (ctx.fecha.anio!==ctx.anio||ctx.fecha.mes!==ctx.periodo*4))
+      return 'La entrega normal del periodo '+ctx.periodo+' de '+ctx.anio+' se registra en '+ENTREGA_MES[ctx.periodo]+' de '+ctx.anio+'. Cambia la fecha de entrega para habilitarla.';
+    if(ctx.tipo==='adelanto'){
+      var destino=siguiente(ctx.fecha);
+      if(destino.anio!==ctx.anio||destino.periodo!==ctx.periodo)
+        return 'El adelanto de este periodo se registra en el cuatrimestre anterior. Cambia la fecha del movimiento a ese cuatrimestre.';
+    }
     if(ms.some(function(m){return m.tipo===ctx.tipo;}))
       return ctx.tipo==='normal'?'Ya existe una entrega normal para este periodo. No se permite otra.':'Ya existe un adelanto para este periodo. No se permite otro.';
     if(progreso(ctx.codigo,r).completo)return 'La dotación del periodo está cubierta por completo. No se permite repetir prendas ni registrar otra entrega.';
@@ -111,19 +121,24 @@ document.addEventListener('DOMContentLoaded', function () {
     el.className='mensaje-oculto';
     el.style.display='none';
   }
-  // Firma original de dotaciones, sin pedir nunca otras dos firmas para confirmar entrega.
-  var sigTrabajador=initFirmaCanvas({
-    canvas:'canvas_trabajador',hidden:'firma_trabajador_data',wrap:'wrap_trabajador',
-    btnLimpiar:'limpiar_trabajador',estado:'estado_trabajador',claseActivo:'activo',
-    capturaEnSuelta:true,dpiAware:false,formato:'image/jpeg',calidad:.6,
-    onCambio:function(v){firmaTrabajador=v;}
-  });
-  var sigEncargado=initFirmaCanvas({
-    canvas:'canvas_encargado',hidden:'firma_encargado_data',wrap:'wrap_encargado',
-    btnLimpiar:'limpiar_encargado',estado:'estado_encargado',claseActivo:'activo',
-    capturaEnSuelta:true,dpiAware:false,formato:'image/jpeg',calidad:.6,
-    onCambio:function(v){firmaEncargado=v;}
-  });
+  // Los canvas están ocultos al entrar: inicializarlos solamente al abrir el formulario.
+  // Inicializarlos cuando display:none provoca dimensiones cero y rompe el trazo.
+  var sigTrabajador=null, sigEncargado=null;
+  function asegurarFirmas() {
+    if(sigTrabajador)return;
+    sigTrabajador=initFirmaCanvas({
+      canvas:'canvas_trabajador',hidden:'firma_trabajador_data',wrap:'wrap_trabajador',
+      btnLimpiar:'limpiar_trabajador',estado:'estado_trabajador',claseActivo:'activo',
+      capturaEnSuelta:true,dpiAware:false,formato:'image/jpeg',calidad:.6,
+      onCambio:function(v){firmaTrabajador=v;}
+    });
+    sigEncargado=initFirmaCanvas({
+      canvas:'canvas_encargado',hidden:'firma_encargado_data',wrap:'wrap_encargado',
+      btnLimpiar:'limpiar_encargado',estado:'estado_encargado',claseActivo:'activo',
+      capturaEnSuelta:true,dpiAware:false,formato:'image/jpeg',calidad:.6,
+      onCambio:function(v){firmaEncargado=v;}
+    });
+  }
   function limpiarFirmas() {
     if(sigTrabajador)sigTrabajador.limpiar();
     if(sigEncargado)sigEncargado.limpiar();
@@ -251,67 +266,145 @@ document.addEventListener('DOMContentLoaded', function () {
     bloque.className='nd-aviso '+clase;
     bloque.textContent=(texto?texto+' ':'')+'Modalidad: '+nota+'.';
   }
-  function renderResumen(ctx){
-    var fecha=ctx?ctx.fecha:fechaValida(hoy.value);
-    var anio=fecha?fecha.anio:new Date().getFullYear();
+  function renderResumen(ctx) {
+    var f=fechaValida(hoy.value),anio=Number(anioConsulta.value);
+    if(!Number.isInteger(anio)||anio<2020||anio>2100){$('ndResumen').innerHTML='<p class="nd-vacio">Indica un año entre 2020 y 2100.</p>';return;}
     $('ndResumen').innerHTML=[1,2,3].map(function(p){
-      var e=ctx?estado(ctx.codigo,anio,p,fecha):{nombre:'Por consultar',clase:'',detalle:'Selecciona un colaborador'};
-      return '<div class="cc-periodo'+(fecha&&p===fecha.periodo?' actual':'')+'">'+
-        '<div class="cc-periodo-topo">Periodo '+p+'</div>'+
-        '<div class="cc-periodo-fechas">'+NOMBRE_PERIODO[p]+' · '+ENTREGA_MES[p]+'</div>'+
+      var e=$('codigo').value && f?estado($('codigo').value,anio,p,f):
+        {nombre:'Por consultar',clase:'',detalle:'Selecciona al colaborador'};
+      var r=registros[clave($('codigo').value,anio,p)];
+      var n=movimientos(r).length;
+      return '<button type="button" class="nd-periodo-boton'+(periodoActivo===p?' activo':'')+
+        '" data-periodo="'+p+'" aria-pressed="'+(periodoActivo===p?'true':'false')+'">'+
+        '<span class="nd-periodo-num">Periodo '+p+' · '+anio+'</span>'+
+        '<span class="nd-periodo-meses">'+NOMBRE_PERIODO[p]+' · Entrega: '+ENTREGA_MES[p]+'</span>'+
         '<span class="cc-estado '+e.clase+'">'+escapeHtml(e.nombre)+'</span>'+
-        '<div class="cc-info-p">'+escapeHtml(e.detalle)+'</div></div>';
+        '<span class="nd-periodo-contador">'+n+' movimiento'+(n===1?'':'s')+
+        ' · '+escapeHtml(e.detalle)+'</span>'+
+        '<span class="nd-periodo-abrir">'+(periodoActivo===p?'Periodo seleccionado':'Ver detalle y registrar')+' ›</span></button>';
     }).join('');
   }
-  function pintarHistorial(ctx){
-    if(!ctx){$('ndHistorial').innerHTML='<div class="nd-vacio">Selecciona el colaborador y la fecha de la entrega.</div>';return;}
-    var periodos=[1,2,3].map(function(p){return {anio:ctx.fecha.anio,periodo:p};});
-    var proximo=siguiente(ctx.fecha);
-    if(proximo.anio!==ctx.fecha.anio)periodos.push(proximo);
-    if(ctx.anio!==ctx.fecha.anio && !periodos.some(function(p){return p.anio===ctx.anio&&p.periodo===ctx.periodo;}))periodos.push({anio:ctx.anio,periodo:ctx.periodo});
-    $('ndHistorial').innerHTML=periodos.map(function(p){
-      var r=registros[clave(ctx.codigo,p.anio,p.periodo)],e=estado(ctx.codigo,p.anio,p.periodo,ctx.fecha);
-      var movimientosHTML=movimientos(r).map(function(m,i){
-        var items=(m.articulos||[]).map(function(a){
-          return '<li>'+escapeHtml(CATALOGO[a.id]||a.id)+', talla '+escapeHtml(a.talla||'—')+', cantidad '+escapeHtml(a.cantidad)+'</li>';
-        }).join('');
-        var firma=m.firmaTrabajador && /^data:image\/(jpeg|png);base64,[A-Za-z0-9+/=]+$/.test(m.firmaTrabajador)
-          ? '<details><summary>Ver firma de quien recibe</summary><img alt="Firma" src="'+m.firmaTrabajador+'"></details>':
-          '<small>Ejemplo sin firma disponible</small>';
-        return '<div class="nd-mov"><strong>'+(m.tipo==='adelanto'?'Adelanto':'Entrega normal')+' · '+formatoFecha(m.fecha)+'</strong>'+
-          '<p>'+escapeHtml(m.concepto||'Sin concepto')+'</p><ul>'+items+'</ul>'+firma+'</div>';
+  function pintarHistorial(ctx) {
+    if(!ctx){$('ndHistorial').innerHTML='<p class="nd-vacio">Selecciona un colaborador y periodo para consultar.</p>';return;}
+    var r=registros[ctx.id],e=estado(ctx.codigo,ctx.anio,ctx.periodo,ctx.fecha),
+      plan=planPeriodo(ctx.codigo,r),dado=entregadoPorArticulo(r);
+    var pendientes=[],recibidas=[];
+    Object.keys(plan).forEach(function(id){
+      var previsto=Number(plan[id].cantidad)||0,recibido=Math.min(previsto,dado[id]||0),resto=previsto-recibido;
+      if(recibido)recibidas.push('<li>'+escapeHtml(CATALOGO[id]||id)+' · '+recibido+' / '+previsto+' · talla '+escapeHtml(plan[id].talla||'—')+'</li>');
+      if(resto)pendientes.push('<li>'+escapeHtml(CATALOGO[id]||id)+' · '+resto+' pendiente'+(resto===1?'':'s')+' · talla '+escapeHtml(plan[id].talla||'—')+'</li>');
+    });
+    var movs=movimientos(r).map(function(m,i){
+      var items=(m.articulos||[]).map(function(a){
+        return '<li>'+escapeHtml(CATALOGO[a.id]||a.id)+' · talla '+escapeHtml(a.talla||'—')+
+        ' · cantidad '+escapeHtml(a.cantidad)+'</li>';
       }).join('');
-      return '<article class="nd-periodo-historial"><h4>Periodo '+p.periodo+' · '+p.anio+'</h4>'+
-        '<span class="cc-estado '+e.clase+'">'+escapeHtml(e.nombre)+'</span>'+
-        '<p class="nd-subdato">'+escapeHtml(e.detalle)+'</p>'+
-        (movimientosHTML||'<p class="nd-subdato">Sin movimientos registrados.</p>')+'</article>';
+      var firma=m.firmaTrabajador&&/^data:image\/(jpeg|png);base64,[A-Za-z0-9+/=]+$/.test(m.firmaTrabajador)
+        ? '<details><summary>Ver firma de quien recibe</summary><img alt="Firma de quien recibe" src="'+m.firmaTrabajador+'"></details>'
+        : '<small>Ejemplo sin firma disponible</small>';
+      return '<div class="nd-mov"><strong>Movimiento '+(i+1)+' · '+(m.tipo==='adelanto'?'Adelanto':'Entrega normal')+
+        ' · '+formatoFecha(m.fecha)+'</strong><p>'+escapeHtml(m.concepto||'Sin concepto')+'</p>'+
+        '<ul>'+items+'</ul>'+firma+'</div>';
     }).join('');
+    $('ndHistorial').innerHTML=
+      '<article class="nd-periodo-historial">'+
+      '<h4>Registro principal · Periodo '+ctx.periodo+' de '+ctx.anio+'</h4>'+
+      '<span class="cc-estado '+e.clase+'">'+escapeHtml(e.nombre)+'</span>'+
+      '<p class="nd-subdato">'+escapeHtml(e.detalle)+'</p>'+
+      '<div class="nd-periodo-balance">'+
+        '<div class="nd-balance-bloque"><strong>✅ Ya entregado</strong>'+(recibidas.length?'<ul>'+recibidas.join('')+'</ul>':'<p class="nd-sin-items">Todavía no hay prendas recibidas.</p>')+'</div>'+
+        '<div class="nd-balance-bloque"><strong>📋 Pendiente de entrega</strong>'+(pendientes.length?'<ul>'+pendientes.join('')+'</ul>':'<p class="nd-sin-items">No hay prendas pendientes.</p>')+'</div>'+
+      '</div>'+
+      '<h4>Historial de movimientos ('+movimientos(r).length+')</h4>'+
+      (movs||'<p class="nd-subdato">No se han registrado adelantos ni entregas de este periodo.</p>')+
+      '</article>';
   }
-  function render(limpiar){
-    var ctx=contexto(),r=ctx?registros[ctx.id]:null,razon=motivoBloqueo(ctx,r);
-    $('ndDestino').innerHTML=ctx?'<strong>'+(ctx.tipo==='adelanto'?'Adelanto':'Entrega normal')+
-      ' para el periodo '+ctx.periodo+' de '+ctx.anio+'</strong><br>'+NOMBRE_PERIODO[ctx.periodo]+
-      ' · Mes de entrega: '+ENTREGA_MES[ctx.periodo]+'.<br>Fecha física: '+formatoFecha(ctx.fecha.fecha):
-      'Selecciona un trabajador y una fecha para calcular la dotación.';
-    var aviso=$('ndAviso');
-    aviso.setAttribute('data-aviso',ctx&&razon?razon:ctx&&ctx.tipo==='adelanto'?
-      'Un adelanto corresponde al siguiente cuatrimestre. Las prendas ya recibidas no se repetirán.':
-      ctx?'El sistema descuenta automáticamente los artículos adelantados.':'');
-    aviso.setAttribute('data-clase',razon?'bloqueo':ctx&&ctx.tipo==='adelanto'?'adelanto':'');
-    $('ndEncargadoBloque').style.display=ctx&&ctx.tipo==='adelanto'?'none':'';
-    $('ndTextoFirmas').textContent=ctx&&ctx.tipo==='adelanto'
-      ? 'Adelanto: se solicita solo la firma del trabajador que recibe. La entrega formal solicita las dos firmas originales.'
-      : 'Entrega normal: el trabajador y el encargado firman esta única entrega, sin confirmación duplicada.';
+  function mensajeRestriccion(ctx) {
+    var r=registros[ctx.id];
+    var normal=motivoBloqueo(Object.assign({},ctx,{tipo:'normal'}),r);
+    var adelanto=motivoBloqueo(Object.assign({},ctx,{tipo:'adelanto'}),r);
+    $('ndAccionNormal').disabled=!!normal;
+    $('ndAccionAdelanto').disabled=!!adelanto;
+    $('ndRequisitosAcciones').textContent=
+      (normal?'Entrega normal: '+normal:'Entrega normal disponible para registrar.')+
+      ' '+(adelanto?'Adelanto: '+adelanto:'Adelanto disponible para registrar.');
+  }
+  function abrirMovimiento(tipo) {
+    var ctx=contexto();if(!ctx)return;
+    var razon=motivoBloqueo(Object.assign({},ctx,{tipo:tipo}),registros[ctx.id]);
+    if(razon){mostrarResultado(razon,true);return;}
+    modoRegistro=tipo;
+    form.querySelector('input[name="nd_tipo"][value="normal"]').checked=tipo==='normal';
+    form.querySelector('input[name="nd_tipo"][value="adelanto"]').checked=tipo==='adelanto';
+    render(true);
+    asegurarFirmas();
+    $('ndMovimientoPanel').scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  function cerrarMovimiento() {
+    modoRegistro=null;
+    render(true);
+  }
+  function render(limpiar) {
+    var ctx=contexto();
     renderResumen(ctx);
-    pintarHistorial(ctx);
-    pintarPrendas(ctx,razon);
-    if(limpiar){limpiarFirmas();limpiarResultado();}
+    $('ndHistorialPanel').hidden=!ctx;
+    $('ndMovimientoPanel').hidden=!ctx||!modoRegistro;
+    $('ndPrendasSeccion').hidden=!ctx||!modoRegistro;
+    if(ctx) {
+      var r=registros[ctx.id];
+      $('ndPeriodoDescripcion').textContent=NOMBRE_PERIODO[ctx.periodo]+' de '+ctx.anio+
+        ' · Entrega ordinaria: '+ENTREGA_MES[ctx.periodo]+'.';
+      pintarHistorial(ctx);
+      mensajeRestriccion(ctx);
+      if(modoRegistro){
+        var c=Object.assign({},ctx,{tipo:modoRegistro}),razon=motivoBloqueo(c,r);
+        $('ndDestino').innerHTML='<strong>'+(modoRegistro==='adelanto'?'Adelanto':'Entrega normal')+
+          ' del periodo '+ctx.periodo+' de '+ctx.anio+'</strong><br>'+NOMBRE_PERIODO[ctx.periodo]+
+          ' · Fecha real del movimiento: '+formatoFecha(ctx.fecha.fecha)+'.';
+        var aviso=$('ndAviso');
+        aviso.setAttribute('data-aviso',razon||(
+          modoRegistro==='adelanto'
+            ? 'El adelanto del cuatrimestre anterior se descontará de esta dotación.'
+            : 'Solo se registrarán las prendas pendientes del mismo periodo.'));
+        aviso.setAttribute('data-clase',razon?'bloqueo':modoRegistro==='adelanto'?'adelanto':'');
+        $('ndEncargadoBloque').style.display=modoRegistro==='adelanto'?'none':'';
+        $('ndTextoFirmas').textContent=modoRegistro==='adelanto'
+          ? 'Adelanto: firma de quien recibe. No se pide una segunda confirmación.'
+          : 'Entrega formal: firma del trabajador y del encargado, una única vez.';
+        pintarPrendas(c,razon);
+      }
+    } else if(periodoActivo && !$('codigo').value) {
+      $('ndHistorialPanel').hidden=false;
+      $('ndHistorial').innerHTML='<p class="nd-vacio">Selecciona primero un colaborador para ver sus movimientos.</p>';
+      $('ndPeriodoDescripcion').textContent='Periodo '+periodoActivo+' · '+anioConsulta.value;
+      $('ndAccionesPeriodo').hidden=true;
+    }
+    if(ctx)$('ndAccionesPeriodo').hidden=false;
+    if(!periodoActivo)$('ndAccionesPeriodo').hidden=true;
+    if(limpiar) {limpiarFirmas();limpiarResultado();}
   }
-  $('fecha_entrega').addEventListener('change',function(){render(true);});
-  Array.prototype.forEach.call(form.querySelectorAll('input[name="nd_tipo"]'),function(radio){
-    radio.addEventListener('change',function(){render(true);});
+  $('ndResumen').addEventListener('click',function(e){
+    var target=e.target.closest('[data-periodo]');
+    if(!target||!this.contains(target))return;
+    periodoActivo=Number(target.getAttribute('data-periodo'));
+    modoRegistro=null;
+    render(true);
   });
-
+  anioConsulta.addEventListener('change',function(){
+    modoRegistro=null;
+    render(true);
+  });
+  $('ndCerrarPeriodo').addEventListener('click',function(){
+    periodoActivo=null;modoRegistro=null;render(true);
+  });
+  $('ndCancelarMovimiento').addEventListener('click',cerrarMovimiento);
+  $('ndAccionNormal').addEventListener('click',function(){abrirMovimiento('normal');});
+  $('ndAccionAdelanto').addEventListener('click',function(){abrirMovimiento('adelanto');});
+  hoy.addEventListener('change',function(){
+    if(!periodoActivo){var f=fechaValida(hoy.value);if(f)anioConsulta.value=f.anio;}
+    modoRegistro=null;
+    render(true);
+  });
   function recogerArticulos(ctx,r){
     var plan=planPeriodo(ctx.codigo,r),entregados=entregadoPorArticulo(r);
     var elegidos=[],cantidadTotal=0,pendienteTotal=0;
