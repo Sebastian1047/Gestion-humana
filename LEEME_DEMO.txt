@@ -73,3 +73,12 @@ CATÁLOGO ABIERTO DE DOTACIÓN (DEMO)
 - Se conserva un registro principal por persona/año/periodo y el historial de movimientos; se bloquean duplicados.
 - Los ejemplos anteriores pueden tener planes de 3 prendas asociados a registros existentes, pero no deshabilitan las demás.
 - El enlace del simulador cuatrimestral anterior redirige al formulario unificado.
+
+GRUPOS EXCLUYENTES (DEMO)
+- Grupo camisas: Camibuso / Camisa Oxford / Camisa Polo.
+- Grupo prendas inferiores: Pantalon / Sudadera / Jean / Overol.
+- Grupo calzado: Zapatos de seguridad / Zapatos / Botas.
+- Al marcar una opcion quedan deshabilitadas las otras del mismo grupo; si se desmarca, vuelven a habilitarse.
+- La exclusión también se mantiene entre un adelanto parcial y la entrega formal del mismo trabajador/periodo; puede completarse la cantidad pendiente de la misma prenda, no mezclar alternativas.
+- Se vuelve a verificar la regla al guardar, no depende únicamente de deshabilitar checkboxes.
+- No se requiere elegir obligatoriamente un artículo de cada grupo.
