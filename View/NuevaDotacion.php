@@ -623,7 +623,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
 
     <script src="../JS/ui-common.js"></script>
     <script src="../JS/firma-canvas.js"></script>
-    <script src="../JS/NuevaDotacionPeriodos.js?v=20261118b"></script>
+    <script src="../JS/NuevaDotacionPeriodos.js?v=20261118c"></script>
     <script src="../JS/Script.js"></script>
     <?php include __DIR__ . '/partials/hamburger_script.php'; ?>
 
