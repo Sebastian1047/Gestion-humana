@@ -1,0 +1,12 @@
+/* Resumen de registros cuatrimestrales de DEMO en el gestor original. */
+.nd-resumen-inicio {margin:4px 0 20px;border:1px solid #d3ddcf;border-radius:10px;background:#f9fbf8;box-shadow:0 1px 4px rgba(0,0,0,.03);overflow:hidden}
+.nd-resumen-inicio summary {padding:14px 17px;cursor:pointer;font-weight:700;color:#334155;font-size:.91rem}
+.nd-resumen-inicio summary:hover {background:#f0f5ef}
+.nd-resumen-inicio #ndCantidadDemo {color:#64748b;font-size:.8rem;font-weight:500;margin-left:6px}
+.nd-resumen-tabla-wrap {overflow-x:auto;padding:4px 16px 0}
+.nd-resumen-inicio table {border-collapse:collapse;width:100%;font-size:.83rem;text-align:left}
+.nd-resumen-inicio th,.nd-resumen-inicio td {padding:10px 12px;border-bottom:1px solid #e2e8f0;color:#334155}
+.nd-resumen-inicio th {background:#f1f5f9;color:#475569}
+.nd-resumen-inicio td small {display:block;color:#64748b;margin-top:4px;font-size:.75rem}
+.nd-resumen-inicio td a {color:var(--color-primario);font-weight:650}
+.nd-resumen-inicio p {margin:12px 16px 15px;font-size:.78rem;color:#64748b;line-height:1.45}
