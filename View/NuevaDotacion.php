@@ -96,7 +96,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                             </div>
 
                             <div class="form-group">
-                                <label for="fecha_entrega">Fecha de Entrega <span class="requerido">*</span></label>
+                                <label for="fecha_entrega">Fecha del movimiento (DEMO) <span class="requerido">*</span></label>
                                 <input type="date" id="fecha_entrega" name="fecha_entrega" class="input"
                                     value="<?php echo date('Y-m-d'); ?>" />
                             </div>
@@ -132,6 +132,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                             <div>
                                 <h3 class="seccion-titulo" id="nd-titulo-control">Dotaciones por periodo</h3>
                                 <p class="nd-hint">Selecciona un periodo para consultar su dotación, los adelantos y lo que falta entregar.</p>
+                                <p class="nd-modo-prueba">Modo prueba: las fechas se ajustan al registrar para que puedas ensayar los tres periodos.</p>
                             </div>
                             <div class="nd-anio-wrap">
                                 <label for="ndAnioConsulta">Año de la dotación</label>
