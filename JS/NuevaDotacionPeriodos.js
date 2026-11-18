@@ -15,12 +15,8 @@ document.addEventListener('DOMContentLoaded', function () {
     zapatos_seguridad:'Zapatos de seguridad', zapatos:'Zapatos', botas:'Botas'
   };
   var ARTICULOS = Object.keys(CATALOGO);
-  // Planes por empleado estrictamente ficticios, iguales al simulador anterior.
-  var PLANES = {
-    DEMO001:{camisa:{cantidad:1,talla:'M'},pantalon:{cantidad:1,talla:'32'},botas:{cantidad:1,talla:'39'}},
-    DEMO002:{camisa_polo:{cantidad:1,talla:'M'},jean:{cantidad:1,talla:'32'},zapatos_seguridad:{cantidad:1,talla:'39'}},
-    DEMO003:{camisa:{cantidad:1,talla:'L'},overol:{cantidad:1,talla:'L'},zapatos_seguridad:{cantidad:1,talla:'40'}}
-  };
+  // Catálogo abierto: el plan se compone solo de prendas seleccionadas.
+  var PLAN_EJEMPLO={camisa:{cantidad:1,talla:'M'},pantalon:{cantidad:1,talla:'32'},botas:{cantidad:1,talla:'39'}};
   var NOMBRE_PERIODO={1:'Enero – Abril',2:'Mayo – Agosto',3:'Septiembre – Diciembre'};
   var ENTREGA_MES={1:'abril',2:'agosto',3:'diciembre'};
   var registros=leer();
@@ -49,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   function clave(codigo,anio,periodo){return codigo+'|'+anio+'|'+periodo;}
   function siguiente(info) {return info.periodo===3?{anio:info.anio+1,periodo:1}:{anio:info.anio,periodo:info.periodo+1};}
-  function planBase(codigo) {return JSON.parse(JSON.stringify(PLANES[codigo]||PLANES.DEMO001));}
+  function planBase() {return {};}
   function leer() {
     try {
       var r=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
@@ -74,16 +70,27 @@ document.addEventListener('DOMContentLoaded', function () {
       previsto+=Number(plan[id].cantidad)||0;
       entregado+=Math.min(Number(plan[id].cantidad)||0,dado[id]||0);
     });
-    return {previsto:previsto,entregado:entregado,completo:previsto>0&&entregado===previsto};
+    return {previsto:previsto,entregado:entregado,cuotasCubiertas:previsto>0&&entregado===previsto};
+  }
+  function dotacionCerrada(r) {
+    var ms=movimientos(r);
+    if(ms.some(function(m){return m.tipo==='normal'||(m.tipo==='adelanto'&&m.modalidad==='completo');}))return true;
+    // Compatibilidad con movimientos de demostración anteriores.
+    if(ms.length&&ms.every(function(m){return m.tipo==='adelanto'&&!m.modalidad;})) {
+      return progreso(r.codigo,r).cuotasCubiertas;
+    }
+    return false;
   }
   function estado(codigo,anio,periodo,fecha) {
     var r=registros[clave(codigo,anio,periodo)],ms=movimientos(r);
     if(!ms.length)return {nombre:'Pendiente',clase:'',detalle:'Sin entregas registradas'};
     var p=progreso(codigo,r),soloAdelanto=ms.every(function(m){return m.tipo==='adelanto';});
-    var inicio=anio*12+(periodo-1)*4+1;
-    var fechaEnMes=fecha.anio*12+fecha.mes;
-    if(p.completo)return {nombre:soloAdelanto&&fechaEnMes<inicio?'Adelantado completamente':soloAdelanto?'Completado por adelanto':'Completado',clase:'completo',detalle:p.entregado+' de '+p.previsto+' artículos entregados'};
-    return {nombre:soloAdelanto&&fechaEnMes<inicio?'Adelantado parcialmente':'Pendiente de completar',clase:'parcial',detalle:p.entregado+' de '+p.previsto+' artículos entregados'};
+    var inicio=anio*12+(periodo-1)*4+1,fechaEnMes=fecha.anio*12+fecha.mes;
+    var resumen=p.entregado+' de '+p.previsto+' unidades programadas entregadas';
+    if(dotacionCerrada(r))return {nombre:soloAdelanto&&fechaEnMes<inicio?'Adelantado completamente':
+      soloAdelanto?'Completado por adelanto':'Completado',clase:'completo',detalle:resumen};
+    return {nombre:soloAdelanto&&fechaEnMes<inicio?'Adelantado parcialmente':'Pendiente de completar',
+      clase:'parcial',detalle:resumen+' · Falta entrega formal'};
   }
   function contexto() {
     var codigo=$('codigo').value.trim(),fecha=fechaValida(hoy.value);
@@ -104,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     if(ms.some(function(m){return m.tipo===ctx.tipo;}))
       return ctx.tipo==='normal'?'Ya existe una entrega normal para este periodo. No se permite otra.':'Ya existe un adelanto para este periodo. No se permite otro.';
-    if(progreso(ctx.codigo,r).completo)return 'La dotación del periodo está cubierta por completo. No se permite repetir prendas ni registrar otra entrega.';
+    if(dotacionCerrada(r))return 'La dotación del periodo ya está cerrada. No se permite otra entrega ni adelanto.';
     return '';
   }
 
