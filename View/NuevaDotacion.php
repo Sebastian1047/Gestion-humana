@@ -126,38 +126,60 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                         </fieldset>
                     </div>
 
-                    <!-- ========== CONTROL POR PERIODO Y ADELANTOS ========== -->
+                    <!-- ========== PERIODOS: PRIMERO CONSULTAR, DESPUES REGISTRAR ========== -->
                     <section class="card-seccion nd-periodo-panel" aria-labelledby="nd-titulo-control">
-                        <h3 class="seccion-titulo" id="nd-titulo-control">Control de dotación por cuatrimestre</h3>
+                        <div class="nd-seccion-cabecera">
+                            <div>
+                                <h3 class="seccion-titulo" id="nd-titulo-control">Dotaciones por periodo</h3>
+                                <p class="nd-hint">Selecciona un periodo para consultar su dotación, los adelantos y lo que falta entregar.</p>
+                            </div>
+                            <div class="nd-anio-wrap">
+                                <label for="ndAnioConsulta">Año de la dotación</label>
+                                <input type="number" id="ndAnioConsulta" min="2020" max="2100" step="1" inputmode="numeric" aria-label="Año de la dotación">
+                            </div>
+                        </div>
+                        <div class="cc-resumen nd-periodos-selector" id="ndResumen" aria-label="Elegir uno de los tres cuatrimestres"></div>
                         <div class="nd-demostracion-acciones">
                             <button type="button" class="cc-btn cc-btn-outline" id="ndCargarEjemplo">Cargar ejemplo abril → agosto 2027</button>
                             <button type="button" class="cc-btn cc-btn-texto" id="ndLimpiarDemo">Reiniciar movimientos de prueba</button>
                         </div>
-                        <div class="nd-dos-col">
+                    </section>
+
+                    <section class="card-seccion nd-historial-panel" id="ndHistorialPanel" aria-labelledby="nd-titulo-historial" hidden>
+                        <div class="nd-historial-encabezado">
                             <div>
-                                <label class="nd-label">Tipo de movimiento</label>
-                                <div class="nd-tipos">
-                                    <label><input type="radio" name="nd_tipo" value="normal" checked> Entrega normal</label>
-                                    <label><input type="radio" name="nd_tipo" value="adelanto"> Adelanto de dotación</label>
-                                </div>
+                                <h3 class="seccion-titulo" id="nd-titulo-historial">Detalle del periodo seleccionado</h3>
+                                <p class="nd-hint" id="ndPeriodoDescripcion"></p>
                             </div>
-                            <div class="nd-destino" id="ndDestino" aria-live="polite">Selecciona un trabajador y una fecha para consultar el periodo.</div>
+                            <button type="button" class="cc-btn cc-btn-texto" id="ndCerrarPeriodo">Cerrar detalle</button>
                         </div>
+                        <div id="ndHistorial" aria-live="polite"></div>
+                        <div id="ndAccionesPeriodo" class="nd-acciones-periodo">
+                            <button type="button" id="ndAccionNormal" class="nd-accion nd-accion-principal">Registrar entrega normal</button>
+                            <button type="button" id="ndAccionAdelanto" class="nd-accion nd-accion-secundaria">Registrar adelanto</button>
+                            <p id="ndRequisitosAcciones" class="nd-ayuda-acciones"></p>
+                        </div>
+                    </section>
+
+                    <section class="card-seccion nd-movimiento-panel" id="ndMovimientoPanel" aria-labelledby="nd-movimiento-titulo" hidden>
+                        <div class="nd-movimiento-encabezado">
+                            <h3 class="seccion-titulo" id="nd-movimiento-titulo">Registrar movimiento</h3>
+                            <button type="button" class="cc-btn cc-btn-texto" id="ndCancelarMovimiento">Cancelar registro</button>
+                        </div>
+                        <div class="nd-tipos" role="group" aria-label="Tipo de movimiento">
+                            <label><input type="radio" name="nd_tipo" value="normal" checked> Entrega normal</label>
+                            <label><input type="radio" name="nd_tipo" value="adelanto"> Adelanto de dotación</label>
+                        </div>
+                        <div class="nd-destino" id="ndDestino"></div>
                         <div id="ndAviso" role="status" aria-live="polite"></div>
-                        <div class="nd-label" style="margin:15px 0 9px;">Estado de las tres dotaciones del año</div>
-                        <div class="cc-resumen" id="ndResumen" aria-live="polite"></div>
                         <div class="nd-concepto">
                             <label for="ndConcepto">Concepto de la entrega o adelanto <span class="requerido">*</span></label>
                             <textarea id="ndConcepto" rows="2" maxlength="400" placeholder="Ej. Entrega ordinaria de agosto, cambio de labor..."></textarea>
                         </div>
-                        <p class="nd-hint">Abril: periodo 1 · Agosto: periodo 2 · Diciembre: periodo 3. Solo se puede adelantar el periodo siguiente. El adelanto puede ser parcial o completo según las prendas seleccionadas.</p>
+                        <p class="nd-hint">Se registra un único movimiento en el historial de la dotación seleccionada. Las prendas ya entregadas no podrán repetirse.</p>
                     </section>
 
-                    <section class="card-seccion nd-historial-panel" aria-labelledby="nd-titulo-historial">
-                        <h3 class="seccion-titulo" id="nd-titulo-historial">Registro principal e historial de movimientos</h3>
-                        <div id="ndHistorial" aria-live="polite"><p class="nd-vacio">Selecciona un colaborador para ver las prendas adelantadas y los movimientos del periodo.</p></div>
-                    </section>
-
+                    <div id="ndPrendasSeccion" hidden>
                     <!-- ========== PRENDAS ENTREGADAS ========== -->
                     <div class="card-seccion">
                         <h3 class="seccion-titulo">Prendas entregadas <small style="font-size:.78rem;font-weight:500;color:#64748b;">(se bloquean los artículos ya recibidos)</small></h3>
@@ -582,7 +604,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                     </div>
 
                     <!-- ========== BOTONES ========== -->
-                    <div class="botones-wrap">
+                    <div class="botones-wrap" id="ndBotonesRegistro">
                         <button type="submit" class="btn btn-guardar" id="btn-guardar">
                             &#10003; Registrar movimiento DEMO
                         </button>
@@ -590,6 +612,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                             &#10005; Cancelar
                         </a>
                     </div>
+                    </div><!-- /ndPrendasSeccion: prendas, firmas, observaciones, guardar -->
 
                 </form>
 
@@ -599,7 +622,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
 
     <script src="../JS/ui-common.js"></script>
     <script src="../JS/firma-canvas.js"></script>
-    <script src="../JS/NuevaDotacionPeriodos.js?v=20261118a"></script>
+    <script src="../JS/NuevaDotacionPeriodos.js?v=20261118b"></script>
     <script src="../JS/Script.js"></script>
     <?php include __DIR__ . '/partials/hamburger_script.php'; ?>
 
