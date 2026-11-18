@@ -372,5 +372,44 @@ document.addEventListener('DOMContentLoaded', function () {
       mostrarResultado('Movimiento DEMO registrado correctamente. Registro único del periodo '+ctx.periodo+'/'+ctx.anio+': '+estadoActual.nombre+'.',false);
     }catch(error){mostrarResultado(error.message||'Error al registrar el movimiento.',true);}
   });
+  // Ejemplo compartido con el simulador existente, para verificar el mismo historial.
+  $('ndCargarEjemplo').addEventListener('click',function(){
+    var codigo='DEMO001',id1=clave(codigo,2027,1),id2=clave(codigo,2027,2);
+    if((registros[id1]||registros[id2])&&!window.confirm('Este ejemplo reemplazará las dotaciones ficticias P1 y P2 de DEMO001 en 2027. ¿Continuar?'))return;
+    var plan=planBase(codigo),previo1=registros[id1],previo2=registros[id2];
+    registros[id1]={codigo:codigo,anio:2027,periodo:1,plan:planBase(codigo),movimientos:[{
+      tipo:'normal',fecha:'2027-04-10',concepto:'Entrega de abril (caso de prueba)',
+      articulos:Object.keys(plan).map(function(id){return {id:id,cantidad:plan[id].cantidad,talla:plan[id].talla};}),
+      firmaTrabajador:null,firmaEncargado:null
+    }]};
+    registros[id2]={codigo:codigo,anio:2027,periodo:2,plan:planBase(codigo),movimientos:[{
+      tipo:'adelanto',fecha:'2027-04-20',concepto:'Cambio de labor: adelanto de botas para agosto (caso de prueba)',
+      articulos:[{id:'botas',cantidad:1,talla:'39'}],firmaTrabajador:null,firmaEncargado:null
+    }]};
+    if(!guardarLocal()){
+      if(previo1)registros[id1]=previo1;else delete registros[id1];
+      if(previo2)registros[id2]=previo2;else delete registros[id2];
+      mostrarResultado('No se pudo guardar el ejemplo en este navegador.',true);return;
+    }
+    $('codigo').value=codigo;
+    $('nombre').value='Persona Demo Uno';
+    $('cargo').value='Area de ejemplo A';
+    $('busqueda').value='Persona Demo Uno';
+    $('genero').value='M';
+    $('fecha_entrega').value='2027-08-15';
+    $('ndConcepto').value='Completar dotación de agosto después del adelanto de abril';
+    form.querySelector('input[name="nd_tipo"][value="normal"]').checked=true;
+    form.querySelector('input[name="nd_tipo"][value="adelanto"]').checked=false;
+    render(true);
+    $('ndConcepto').value='Completar dotación de agosto después del adelanto de abril';
+    mostrarResultado('Ejemplo cargado: botas adelantadas el 20 de abril de 2027; en agosto solo quedan camibuso y pantalón.',false);
+  });
+  $('ndLimpiarDemo').addEventListener('click',function(){
+    if(!window.confirm('¿Borrar TODOS los movimientos de prueba de esta DEMO guardados en este navegador?'))return;
+    registros={};
+    try{localStorage.removeItem(STORAGE_KEY);}catch(_){}
+    render(true);
+    mostrarResultado('Se eliminaron los movimientos ficticios. No se afectó la base de datos.',false);
+  });
   render(false);
 });
