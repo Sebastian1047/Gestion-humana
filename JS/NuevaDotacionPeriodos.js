@@ -319,20 +319,50 @@ document.addEventListener('DOMContentLoaded', function () {
       (movs||'<p class="nd-subdato">No se han registrado adelantos ni entregas de este periodo.</p>')+
       '</article>';
   }
+  // En la DEMO, las fechas se acomodan automáticamente a la operación
+  // seleccionada. La validación de periodos/adelantos y duplicados permanece.
+  function fechaPrueba(ctx, tipo) {
+    if(tipo==='normal') {
+      if(ctx.fecha.anio===ctx.anio&&ctx.fecha.mes===ctx.periodo*4)return ctx.fecha;
+      return fechaValida(ctx.anio+'-'+String(ctx.periodo*4).padStart(2,'0')+'-15');
+    }
+    var actual=siguiente(ctx.fecha);
+    if(actual.anio===ctx.anio&&actual.periodo===ctx.periodo)return ctx.fecha;
+    var previo=ctx.periodo===1?{anio:ctx.anio-1,mes:12}:
+      {anio:ctx.anio,mes:(ctx.periodo-1)*4};
+    return fechaValida(previo.anio+'-'+String(previo.mes).padStart(2,'0')+'-15');
+  }
+  function contextoPrueba(ctx,tipo){
+    return Object.assign({},ctx,{tipo:tipo,fecha:fechaPrueba(ctx,tipo)});
+  }
   function mensajeRestriccion(ctx) {
     var r=registros[ctx.id];
-    var normal=motivoBloqueo(Object.assign({},ctx,{tipo:'normal'}),r);
-    var adelanto=motivoBloqueo(Object.assign({},ctx,{tipo:'adelanto'}),r);
+    // La elegibilidad se calcula sobre la fecha simulada de cada acción,
+    // y NO sobre la fecha elegida previamente para otro movimiento.
+    var normalCtx=contextoPrueba(ctx,'normal');
+    var adelantoCtx=contextoPrueba(ctx,'adelanto');
+    var normal=motivoBloqueo(normalCtx,r);
+    var adelanto=motivoBloqueo(adelantoCtx,r);
     $('ndAccionNormal').disabled=!!normal;
     $('ndAccionAdelanto').disabled=!!adelanto;
+    $('ndAccionNormal').textContent='Registrar entrega normal';
+    $('ndAccionAdelanto').textContent='Registrar adelanto';
     $('ndRequisitosAcciones').textContent=
-      (normal?'Entrega normal: '+normal:'Entrega normal disponible para registrar.')+
-      ' '+(adelanto?'Adelanto: '+adelanto:'Adelanto disponible para registrar.');
+      'MODO PRUEBA: puedes registrar en cualquiera de los tres periodos. '+
+      'Entrega normal: fecha simulada '+formatoFecha(normalCtx.fecha.fecha)+
+      '. Adelanto: fecha simulada '+formatoFecha(adelantoCtx.fecha.fecha)+'. '+
+      'Al pulsar una acción, la fecha se ajusta automáticamente. '+
+      (normal?'Entrega normal no disponible: '+normal+' ':'')+
+      (adelanto?'Adelanto no disponible: '+adelanto:'')+
+      (!normal&&!adelanto?'Solo se bloquean periodos ya cubiertos o movimientos duplicados.':'');
   }
   function abrirMovimiento(tipo) {
     var ctx=contexto();if(!ctx)return;
-    var razon=motivoBloqueo(Object.assign({},ctx,{tipo:tipo}),registros[ctx.id]);
+    var prueba=contextoPrueba(ctx,tipo);
+    var razon=motivoBloqueo(prueba,registros[ctx.id]);
     if(razon){mostrarResultado(razon,true);return;}
+    // Únicamente en la DEMO se precarga la fecha correcta.
+    hoy.value=prueba.fecha.fecha;
     modoRegistro=tipo;
     form.querySelector('input[name="nd_tipo"][value="normal"]').checked=tipo==='normal';
     form.querySelector('input[name="nd_tipo"][value="adelanto"]').checked=tipo==='adelanto';
@@ -360,7 +390,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var c=Object.assign({},ctx,{tipo:modoRegistro}),razon=motivoBloqueo(c,r);
         $('ndDestino').innerHTML='<strong>'+(modoRegistro==='adelanto'?'Adelanto':'Entrega normal')+
           ' del periodo '+ctx.periodo+' de '+ctx.anio+'</strong><br>'+NOMBRE_PERIODO[ctx.periodo]+
-          ' · Fecha real del movimiento: '+formatoFecha(ctx.fecha.fecha)+'.';
+          ' · Fecha simulada del movimiento: '+formatoFecha(ctx.fecha.fecha)+'.';
         var aviso=$('ndAviso');
         aviso.setAttribute('data-aviso',razon||(
           modoRegistro==='adelanto'
