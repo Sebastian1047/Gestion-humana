@@ -191,7 +191,8 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                     <!-- ========== PRENDAS ENTREGADAS ========== -->
                     <div class="card-seccion">
                         <h3 class="seccion-titulo">Prendas entregadas <small style="font-size:.78rem;font-weight:500;color:#64748b;">(se bloquean los artículos ya recibidos)</small></h3>
-                        <p class="nd-prendas-instruccion" id="ndPlanDescripcion">Selecciona libremente cualquiera de las 10 prendas, talla, cantidad y total previsto para el periodo.</p>
+                        <p class="nd-prendas-instruccion" id="ndPlanDescripcion">Puedes elegir una prenda de cada grupo: camisas, pantalones/overol y calzado. Las alternativas del mismo grupo se deshabilitan automáticamente.</p>
+                        <p class="nd-regla-grupos">Máximo una opción por grupo y periodo, tanto en entregas normales como en adelantos. Las unidades pendientes de la opción elegida podrán completarse después.</p>
 
                         <!-- Grupo: Ropa de trabajo -->
                         <p class="prendas-grupo-label">🧥 Ropa de trabajo</p>
@@ -630,7 +631,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
 
     <script src="../JS/ui-common.js"></script>
     <script src="../JS/firma-canvas.js"></script>
-    <script src="../JS/NuevaDotacionPeriodos.js?v=20261118d"></script>
+    <script src="../JS/NuevaDotacionPeriodos.js?v=20261118e"></script>
     <script src="../JS/Script.js"></script>
     <?php include __DIR__ . '/partials/hamburger_script.php'; ?>
 
