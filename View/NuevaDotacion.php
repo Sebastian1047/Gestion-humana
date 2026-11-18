@@ -171,6 +171,13 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                             <label><input type="radio" name="nd_tipo" value="normal" checked> Entrega normal</label>
                             <label><input type="radio" name="nd_tipo" value="adelanto"> Adelanto de dotación</label>
                         </div>
+                        <fieldset class="nd-modalidad-adelanto" id="ndModalidadAdelanto" hidden>
+                            <legend>Tipo de adelanto</legend>
+                            <label><input type="radio" name="nd_modalidad" value="parcial" checked>
+                                Parcial: se entregan algunas prendas; se completará en la entrega normal.</label>
+                            <label><input type="radio" name="nd_modalidad" value="completo">
+                                Completo: cubre toda la dotación del periodo y lo cierra.</label>
+                        </fieldset>
                         <div class="nd-destino" id="ndDestino"></div>
                         <div id="ndAviso" role="status" aria-live="polite"></div>
                         <div class="nd-concepto">
@@ -184,7 +191,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                     <!-- ========== PRENDAS ENTREGADAS ========== -->
                     <div class="card-seccion">
                         <h3 class="seccion-titulo">Prendas entregadas <small style="font-size:.78rem;font-weight:500;color:#64748b;">(se bloquean los artículos ya recibidos)</small></h3>
-                        <p class="nd-prendas-instruccion" id="ndPlanDescripcion">Selecciona un colaborador para ver las prendas que corresponden a su dotación de prueba.</p>
+                        <p class="nd-prendas-instruccion" id="ndPlanDescripcion">Selecciona libremente cualquiera de las 10 prendas, talla, cantidad y total previsto para el periodo.</p>
 
                         <!-- Grupo: Ropa de trabajo -->
                         <p class="prendas-grupo-label">🧥 Ropa de trabajo</p>
@@ -623,7 +630,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
 
     <script src="../JS/ui-common.js"></script>
     <script src="../JS/firma-canvas.js"></script>
-    <script src="../JS/NuevaDotacionPeriodos.js?v=20261118c"></script>
+    <script src="../JS/NuevaDotacionPeriodos.js?v=20261118d"></script>
     <script src="../JS/Script.js"></script>
     <?php include __DIR__ . '/partials/hamburger_script.php'; ?>
 
