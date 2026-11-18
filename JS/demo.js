@@ -1,7 +1,9 @@
 document.addEventListener('DOMContentLoaded', function () {
   const banner = document.createElement('div');
   banner.id = 'demo-print-banner';
-  banner.textContent = 'DEMOSTRACION | Datos ficticios | Guardar, eliminar y subir archivos estan deshabilitados. No ingrese datos personales.';
+  banner.textContent = location.pathname.endsWith('/ControlCuatrimestral.php')
+    ? 'SIMULADOR DEMO | Datos ficticios | Movimientos de prueba guardados solo en este navegador. No use datos personales reales.'
+    : 'DEMOSTRACION | Datos ficticios | Guardar, eliminar y subir archivos estan deshabilitados. No ingrese datos personales.';
   banner.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:99999;background:#fff1cf;color:#543900;padding:10px 16px;font:13px Arial;text-align:center;border-top:1px solid #dabd79';
   document.body.appendChild(banner);
   // El aviso de la DEMO es informativo en pantalla, no parte de los comprobantes PDF.
