@@ -411,5 +411,12 @@ document.addEventListener('DOMContentLoaded', function () {
     render(true);
     mostrarResultado('Se eliminaron los movimientos ficticios. No se afectó la base de datos.',false);
   });
+  // Fuera de abril/agosto/diciembre, priorizar por defecto el adelanto.
+  // La entrega normal sigue disponible para simularla eligiendo su mes.
+  var fechaInicial=fechaValida(hoy.value);
+  if(fechaInicial&&[4,8,12].indexOf(fechaInicial.mes)===-1){
+    form.querySelector('input[name="nd_tipo"][value="adelanto"]').checked=true;
+    form.querySelector('input[name="nd_tipo"][value="normal"]').checked=false;
+  }
   render(false);
 });
