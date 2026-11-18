@@ -97,3 +97,5 @@
 .nd-movimiento-panel {border-top:4px solid #780606}
 .nd-movimiento-panel .nd-destino {margin-top:12px}
 @media(max-width:720px){.nd-periodo-balance{grid-template-columns:1fr}.nd-periodos-selector{grid-template-columns:1fr}.nd-seccion-cabecera{flex-direction:column}}
+
+#ndAccionesPeriodo[hidden] {display:none !important}
