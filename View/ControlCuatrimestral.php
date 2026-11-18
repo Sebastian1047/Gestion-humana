@@ -1,4 +1,9 @@
-<?php require_once __DIR__ . '/../Config/demo.php'; ?>
+<?php
+// La demostración cuatrimestral se fusionó con Nueva Dotación.
+header('Location: NuevaDotacion.php', true, 302);
+exit;
+require_once __DIR__ . '/../Config/demo.php';
+?>
 <?php
 session_start();
 if (!isset($_SESSION['user'])) {
