@@ -63,3 +63,13 @@ PRUEBA DE CUALQUIER PERIODO
 - Los botones de entrega normal o adelanto se habilitan con una fecha ficticia apropiada para el periodo elegido; al pulsarlos, el formulario ajusta la fecha automaticamente (entrega: abril, agosto o diciembre; adelanto: ultimo mes del cuatrimestre anterior).
 - Los botones permanecen bloqueados cuando el periodo ya esta cubierto o la misma operacion ya se registro.
 - Todos estos movimientos son exclusivamente simulados en el navegador; el backend real mantiene las restricciones originales y no se modifica.
+
+CATÁLOGO ABIERTO DE DOTACIÓN (DEMO)
+- Ahora se pueden seleccionar las 10 prendas. No hay 3 prendas obligatorias para DEMO001 ni para otros colaboradores.
+- Cada prenda seleccionada tiene talla, cantidad que se entrega ahora y total previsto para ese periodo (inicialmente 1).
+- Si se adelanta una cantidad menor que la prevista, la diferencia queda pendiente; al completarla se bloquea esa prenda.
+- La entrega normal completa las cantidades pendientes previamente programadas y permite añadir otras prendas libres, sin exigir las diez.
+- El adelanto puede marcarse Parcial (permite completar) o Completo (cierra el periodo).
+- Se conserva un registro principal por persona/año/periodo y el historial de movimientos; se bloquean duplicados.
+- Los ejemplos anteriores pueden tener planes de 3 prendas asociados a registros existentes, pero no deshabilitan las demás.
+- El enlace del simulador cuatrimestral anterior redirige al formulario unificado.
