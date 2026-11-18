@@ -23,7 +23,7 @@ $paginas_preingreso = ['preingreso.php', 'entrevistaPreSele.php'];
                     <li><a href="dashboard.php" class="<?= ($pagina_actual == 'dashboard.php') ? 'active' : '' ?>">🏠 Inicio</a></li>
                     <li><a href="preingreso.php" class="<?= in_array($pagina_actual, $paginas_preingreso) ? 'active' : '' ?>">📋 Pre-Ingreso</a></li>
                     <li><a href="postingreso.php" class="<?= ($pagina_actual == 'postingreso.php') ? 'active' : '' ?>">📝 Post-Ingreso</a></li>
-                    <li><a href="Dotacion.php" class="<?= in_array($pagina_actual, ['Dotacion.php', 'NuevaDotacion.php', 'editarDotacion.php', 'Verdotacion.php', 'TallasExistencias.php', 'EquivalenciasBodega.php']) ? 'active' : '' ?>">🦺 Dotaciones</a></li>
+                    <li><a href="Dotacion.php" class="<?= in_array($pagina_actual, ['Dotacion.php', 'NuevaDotacion.php', 'editarDotacion.php', 'Verdotacion.php', 'TallasExistencias.php', 'EquivalenciasBodega.php', 'ControlCuatrimestral.php']) ? 'active' : '' ?>">🦺 Dotaciones</a></li>
                     <li>
                         <a href="../Controller/logout.php" class="btn-logout" id="btnLogout"> 🚪 Cerrar sesión</a>
 
