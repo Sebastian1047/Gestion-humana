@@ -15,7 +15,7 @@ INICIAR
 
 PARA REVISAR
 - Inicio, menu, preingreso y formulario de entrevista con sus pasos.
-- Dotaciones: tres personas ficticias; busqueda, filtros, detalle y formulario de edicion.
+- Dotaciones: tres personas ficticias; busqueda, filtros, detalle y formulario de edicion. Los registros creados en el nuevo formulario integrado se listan por separado en "Dotaciones y adelantos registrados en esta DEMO", sin modificar los registros originales.
 - Nueva dotacion: desde "Agregar nuevo registro", buscar 'Demo' o 'DEMO001' y probar el formulario integrado con control cuatrimestral, adelantos parciales/completos, prendas y tallas originales, firmas y registro principal con historial. Los movimientos se almacenan en localStorage y comparten datos con el simulador de control cuatrimestral. El backend real sigue bloqueado en DEMO.
 - Control cuatrimestral y adelantos: abrir desde Dotaciones -> "Control cuatrimestral y adelantos · DEMO".
   * Entregas normales solo en abril (P1), agosto (P2), diciembre (P3).
