@@ -129,6 +129,10 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                     <!-- ========== CONTROL POR PERIODO Y ADELANTOS ========== -->
                     <section class="card-seccion nd-periodo-panel" aria-labelledby="nd-titulo-control">
                         <h3 class="seccion-titulo" id="nd-titulo-control">Control de dotación por cuatrimestre</h3>
+                        <div class="nd-demostracion-acciones">
+                            <button type="button" class="cc-btn cc-btn-outline" id="ndCargarEjemplo">Cargar ejemplo abril → agosto 2027</button>
+                            <button type="button" class="cc-btn cc-btn-texto" id="ndLimpiarDemo">Reiniciar movimientos de prueba</button>
+                        </div>
                         <div class="nd-dos-col">
                             <div>
                                 <label class="nd-label">Tipo de movimiento</label>
