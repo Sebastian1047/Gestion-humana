@@ -58,3 +58,42 @@
 .nd-demostracion-acciones .cc-btn:hover {background:#fff3f3}
 .nd-demostracion-acciones .cc-btn-texto {color:#64748b;background:#f1f5f9;border-color:#e2e8f0}
 @media(max-width:770px){.nd-periodo-panel .cc-resumen{grid-template-columns:1fr}}
+
+
+/* Periodos navegables: primero consulta, después acción */
+#ndHistorialPanel[hidden],#ndMovimientoPanel[hidden],#ndPrendasSeccion[hidden] {display:none !important}
+.nd-seccion-cabecera,.nd-historial-encabezado,.nd-movimiento-encabezado {display:flex;justify-content:space-between;align-items:flex-start;gap:15px;flex-wrap:wrap}
+.nd-seccion-cabecera .seccion-titulo,.nd-historial-encabezado .seccion-titulo,.nd-movimiento-encabezado .seccion-titulo {margin-bottom:4px}
+.nd-seccion-cabecera .nd-hint,.nd-historial-encabezado .nd-hint {margin:4px 0 16px}
+.nd-anio-wrap {display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.nd-anio-wrap label {color:#334155;font-size:.82rem;font-weight:700}
+.nd-anio-wrap input {border:1px solid #cbd5e1;background:white;border-radius:8px;padding:9px 10px;width:95px;font:inherit;font-size:.89rem}
+.nd-periodos-selector {margin:12px 0 18px}
+.nd-periodos-selector .nd-periodo-boton {display:flex;flex-direction:column;align-items:flex-start;text-align:left;width:100%;min-width:0;gap:5px;cursor:pointer;border:1px solid #cbd5e1;background:#f8fafc;border-radius:11px;padding:16px 18px;min-height:158px;transition:background-color .16s,box-shadow .16s,border-color .16s}
+.nd-periodos-selector .nd-periodo-boton:hover {background:#f5f8f5;border-color:#947b7b;box-shadow:0 2px 8px rgba(0,0,0,.07)}
+.nd-periodos-selector .nd-periodo-boton.activo {border:2px solid #780606;background:#fff8f8;box-shadow:0 0 0 2px #f5dddd}
+.nd-periodo-boton .nd-periodo-num {font-size:1.05rem;font-weight:750;color:#263447}
+.nd-periodo-boton .nd-periodo-meses {font-size:.79rem;color:#64748b}
+.nd-periodo-boton .nd-periodo-contador {font-size:.77rem;color:#475569;margin-top:5px}
+.nd-periodo-boton .nd-periodo-abrir {font-size:.81rem;font-weight:750;color:#780606;margin-top:auto;padding-top:9px}
+.nd-periodos-selector .cc-estado {white-space:normal}
+.nd-historial-panel {border-color:#d4c3c3}
+.nd-historial-panel #ndHistorial {display:block}
+.nd-historial-panel .nd-periodo-historial {background:#fff;border:1px solid #e2e8f0;border-radius:9px;padding:14px;margin-top:12px}
+.nd-periodo-balance {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:15px 0}
+.nd-balance-bloque {padding:13px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px}
+.nd-balance-bloque strong {display:block;font-size:.85rem;color:#334155;margin-bottom:7px}
+.nd-balance-bloque ul {padding-left:18px;line-height:1.6;font-size:.83rem;color:#475569}
+.nd-balance-bloque .nd-sin-items {font-size:.8rem;color:#64748b;margin:0}
+.nd-acciones-periodo {padding:16px 0 0;margin-top:16px;border-top:1px solid #e2e8f0;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.nd-accion {font-size:.87rem;font-weight:700;padding:12px 16px;border-radius:8px;cursor:pointer;border:1px solid #c9d2da;transition:background-color .16s}
+.nd-accion-principal {background:#780606;color:white;border-color:#780606}
+.nd-accion-secundaria {background:white;color:#780606;border-color:#d8b9b9}
+.nd-accion:disabled {background:#f1f5f9;color:#94a3b8;border-color:#e2e8f0;cursor:not-allowed}
+.nd-ayuda-acciones {width:100%;font-size:.8rem;color:#64748b;line-height:1.5;margin:4px 0 0}
+.nd-movimiento-panel .nd-tipos {margin:12px 0}
+.nd-movimiento-panel .nd-tipos label {cursor:default}
+.nd-movimiento-panel .nd-tipos input {pointer-events:none}
+.nd-movimiento-panel {border-top:4px solid #780606}
+.nd-movimiento-panel .nd-destino {margin-top:12px}
+@media(max-width:720px){.nd-periodo-balance{grid-template-columns:1fr}.nd-periodos-selector{grid-template-columns:1fr}.nd-seccion-cabecera{flex-direction:column}}
