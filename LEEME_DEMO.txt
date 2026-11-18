@@ -57,3 +57,9 @@ No se guardan formularios del sistema original ni documentos en el servidor. El 
 Los nombres, codigos, areas y articulos del ejemplo fueron inventados.
 Se conservan el nombre corporativo, logos y la estructura visible para revisar el diseno.
 Compartir solo este ZIP. No mezclar esta copia con la carpeta de produccion.
+
+PRUEBA DE CUALQUIER PERIODO
+- En Nueva Dotacion, se puede seleccionar cualquiera de los tres periodos aunque hoy no sea abril/agosto/diciembre.
+- Los botones de entrega normal o adelanto se habilitan con una fecha ficticia apropiada para el periodo elegido; al pulsarlos, el formulario ajusta la fecha automaticamente (entrega: abril, agosto o diciembre; adelanto: ultimo mes del cuatrimestre anterior).
+- Los botones permanecen bloqueados cuando el periodo ya esta cubierto o la misma operacion ya se registro.
+- Todos estos movimientos son exclusivamente simulados en el navegador; el backend real mantiene las restricciones originales y no se modifica.
