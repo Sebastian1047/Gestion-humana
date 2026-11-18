@@ -460,6 +460,7 @@ document.addEventListener('DOMContentLoaded', function () {
       }
       $('ndConcepto').value='';
       $('observaciones').value='';
+      modoRegistro=null; // La entrega termina y vuelve al detalle del periodo.
       render(true);
       var estadoActual=estado(ctx.codigo,ctx.anio,ctx.periodo,ctx.fecha);
       mostrarResultado('Movimiento DEMO registrado correctamente. Registro único del periodo '+ctx.periodo+'/'+ctx.anio+': '+estadoActual.nombre+'.',false);
@@ -490,12 +491,15 @@ document.addEventListener('DOMContentLoaded', function () {
     $('busqueda').value='Persona Demo Uno';
     $('genero').value='M';
     $('fecha_entrega').value='2027-08-15';
+    anioConsulta.value='2027';
+    periodoActivo=2;
+    modoRegistro=null;
     $('ndConcepto').value='Completar dotación de agosto después del adelanto de abril';
     form.querySelector('input[name="nd_tipo"][value="normal"]').checked=true;
     form.querySelector('input[name="nd_tipo"][value="adelanto"]').checked=false;
     render(true);
     $('ndConcepto').value='Completar dotación de agosto después del adelanto de abril';
-    mostrarResultado('Ejemplo cargado: botas adelantadas el 20 de abril de 2027; en agosto solo quedan camibuso y pantalón.',false);
+    mostrarResultado('Ejemplo cargado: abriste el periodo 2 de 2027. Verás las botas adelantadas en abril y el camibuso y pantalón pendientes. Para completarlos, pulsa «Registrar entrega normal».',false);
   });
   $('ndLimpiarDemo').addEventListener('click',function(){
     if(!window.confirm('¿Borrar TODOS los movimientos de prueba de esta DEMO guardados en este navegador?'))return;
@@ -504,12 +508,7 @@ document.addEventListener('DOMContentLoaded', function () {
     render(true);
     mostrarResultado('Se eliminaron los movimientos ficticios. No se afectó la base de datos.',false);
   });
-  // Fuera de abril/agosto/diciembre, priorizar por defecto el adelanto.
-  // La entrega normal sigue disponible para simularla eligiendo su mes.
-  var fechaInicial=fechaValida(hoy.value);
-  if(fechaInicial&&[4,8,12].indexOf(fechaInicial.mes)===-1){
-    form.querySelector('input[name="nd_tipo"][value="adelanto"]').checked=true;
-    form.querySelector('input[name="nd_tipo"][value="normal"]').checked=false;
-  }
+  // Primero se consultan los periodos. El formulario solo aparece
+  // al pulsar una acción explícita dentro del periodo seleccionado.
   render(false);
 });
