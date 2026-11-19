@@ -82,3 +82,26 @@ GRUPOS EXCLUYENTES (DEMO)
 - La exclusión también se mantiene entre un adelanto parcial y la entrega formal del mismo trabajador/periodo; puede completarse la cantidad pendiente de la misma prenda, no mezclar alternativas.
 - Se vuelve a verificar la regla al guardar, no depende únicamente de deshabilitar checkboxes.
 - No se requiere elegir obligatoriamente un artículo de cada grupo.
+
+BANCO DE PRUEBAS: FLUJO COMPLETO Y RESPALDOS (DEMO)
+- Abrir Dotaciones -> Agregar nuevo registro, escoger DEMO001, DEMO002 o DEMO003 y un año.
+- Desplegar "Banco de pruebas: recorrer, guardar y recuperar dotaciones".
+- El recorrido guiado tiene 8 acciones: (1) entrega de abril P1, (2) intento duplicado P1,
+  (3) adelanto parcial P2 hecho en abril, (4) completar P2 en agosto, (5) duplicado P2,
+  (6) adelanto P3 desde agosto, (7) entrega formal P3 en diciembre,
+  (8) adelanto P1 del siguiente año en diciembre.
+- Cada movimiento confirmado se guarda automaticamente bajo la clave trabajador|año|periodo,
+  en localStorage del navegador de la DEMO; NO requiere SQL Server ni modificar API real.
+- Los intentos bloqueados se comprueban sin crear registros y quedan marcados en el recorrido.
+- "Guardar copia" almacena hasta 5 snapshots con nombre en el MISMO navegador,
+  "Recuperar" restaura una copia confirmada y "Eliminar copia" no borra datos actuales.
+- "Descargar respaldo JSON" crea un archivo portable para importar desde otro navegador/equipo;
+  "Importar respaldo JSON" restaura registros de prueba con confirmacion, reemplazando los actuales.
+- El respaldo puede incluir firmas digitales dibujadas. USAR SOLO DATOS FICTICIOS,
+  no registrar nombres, codigos o firmas de empleados reales y no compartir los JSON publicamente.
+- "Reiniciar movimientos de prueba" elimina los movimientos actuales e intentos bloqueados,
+  pero NO elimina las copias de seguridad guardadas en el navegador.
+- Las pruebas guardadas en localStorage NO se comparten automaticamente entre compañeros,
+  navegadores ni dispositivos. La descarga/importacion JSON permite pasarlas manualmente.
+- Los datos pueden perderse al borrar datos del sitio, al navegar en modo incognito
+  o si el navegador restringe almacenamiento. Descargar respaldos para mayor seguridad.
