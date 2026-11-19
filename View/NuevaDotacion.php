@@ -146,6 +146,43 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                         </div>
                     </section>
 
+                    <!-- BANCO DE PRUEBAS: datos aislados en el navegador, exportables como JSON. -->
+                    <section class="card-seccion nd-banco-pruebas" aria-labelledby="ndBancoTitulo">
+                        <details id="ndBancoDetalles" open>
+                            <summary id="ndBancoTitulo">🧪 Banco de pruebas: recorrer, guardar y recuperar dotaciones</summary>
+                            <p class="nd-hint">Los movimientos se guardan automáticamente en este navegador cuando registras cada entrega o adelanto. Puedes cerrar la página y continuar después. Usa una copia de prueba o descarga el respaldo si quieres conservarlo fuera del navegador.</p>
+                            <p class="nd-banco-aviso">Solo datos ficticios de la DEMO. No utilices nombres reales ni firmas auténticas. Las pruebas no se guardan en la base de datos del sistema.</p>
+                            <div class="nd-banco-estado" id="ndEstadoGuardado" aria-live="polite">Comprobando movimientos de prueba...</div>
+                            <div class="nd-ruta-intro">
+                                <h4>Recorrido sugerido de principio a fin</h4>
+                                <p>Primero selecciona un colaborador ficticio. Luego sigue estas acciones en orden: cada botón abre el periodo y fecha de prueba correspondientes, o comprueba si se bloquea un duplicado.</p>
+                            </div>
+                            <div class="nd-ruta-pasos" id="ndRutaPasos"></div>
+                            <div class="nd-banco-mensaje" id="ndEscenarioResultado" aria-live="polite" hidden></div>
+                            <div class="nd-banco-separador"></div>
+                            <h4>Copias de prueba recuperables</h4>
+                            <div class="nd-copia-acciones">
+                                <label class="nd-copia-nombre">Nombre de la copia
+                                    <input type="text" id="ndNombreCopia" maxlength="60" placeholder="Ej. Prueba completa 2027">
+                                </label>
+                                <button type="button" id="ndGuardarCopia" class="cc-btn cc-btn-outline">Guardar copia</button>
+                                <label class="nd-copia-nombre">Copias guardadas
+                                    <select id="ndCopiasGuardadas" aria-label="Seleccionar copia de prueba"><option value="">Seleccionar copia...</option></select>
+                                </label>
+                                <button type="button" id="ndRecuperarCopia" class="cc-btn cc-btn-outline">Recuperar</button>
+                                <button type="button" id="ndEliminarCopia" class="cc-btn cc-btn-texto">Eliminar copia</button>
+                            </div>
+                            <div class="nd-banco-separador"></div>
+                            <h4>Respaldo para descargar y restaurar</h4>
+                            <div class="nd-copia-acciones">
+                                <button type="button" id="ndExportarPruebas" class="cc-btn cc-btn-outline">Descargar respaldo JSON</button>
+                                <button type="button" id="ndImportarPruebas" class="cc-btn cc-btn-outline">Importar respaldo JSON</button>
+                                <input type="file" id="ndArchivoImportar" accept=".json,application/json" hidden>
+                            </div>
+                            <p class="nd-hint">El archivo descargado incluye los movimientos ficticios, las prendas y las firmas dibujadas en esta DEMO. Guárdalo de forma privada. Importar un respaldo reemplaza los movimientos de prueba actuales, previa confirmación.</p>
+                        </details>
+                    </section>
+
                     <section class="card-seccion nd-historial-panel" id="ndHistorialPanel" aria-labelledby="nd-titulo-historial" hidden>
                         <div class="nd-historial-encabezado">
                             <div>
@@ -631,7 +668,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
 
     <script src="../JS/ui-common.js"></script>
     <script src="../JS/firma-canvas.js"></script>
-    <script src="../JS/NuevaDotacionPeriodos.js?v=20261118e"></script>
+    <script src="../JS/NuevaDotacionPeriodos.js?v=20261119a"></script>
     <script src="../JS/Script.js"></script>
     <?php include __DIR__ . '/partials/hamburger_script.php'; ?>
 
