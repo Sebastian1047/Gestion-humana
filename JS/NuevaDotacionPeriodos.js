@@ -37,6 +37,10 @@ document.addEventListener('DOMContentLoaded', function () {
   var NOMBRE_PERIODO={1:'Enero – Abril',2:'Mayo – Agosto',3:'Septiembre – Diciembre'};
   var ENTREGA_MES={1:'abril',2:'agosto',3:'diciembre'};
   var registros=leer();
+  var SNAPSHOTS_KEY='gestion_humana_demo_dotaciones_copias_v1';
+  var INTENTOS_KEY='gestion_humana_demo_dotaciones_intentos_v1';
+  var intentos=leerIntentos();
+  var anioRuta=null;
   var firmaTrabajador=null, firmaEncargado=null;
   var timeoutBusqueda=null;
   var hoy=$('fecha_entrega');
@@ -73,6 +77,12 @@ document.addEventListener('DOMContentLoaded', function () {
     try {localStorage.setItem(STORAGE_KEY,JSON.stringify(registros));return true;}catch(_){return false;}
   }
   function movimientos(r){return r&&Array.isArray(r.movimientos)?r.movimientos:[];}
+  function leerIntentos(){
+    try {
+      var v=JSON.parse(localStorage.getItem(INTENTOS_KEY)||'[]');
+      return Array.isArray(v)?v.filter(function(i){return i&&i.tipo==='normal'&&i.codigo&&i.anio&&i.periodo;}).slice(-100):[];
+    }catch(_){return [];}
+  }
   function planPeriodo(codigo,r){return r&&r.plan?r.plan:planBase(codigo);}
   function entregadoPorArticulo(r) {
     var totales={};
@@ -516,6 +526,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if(ctx)$('ndAccionesPeriodo').hidden=false;
     if(!periodoActivo)$('ndAccionesPeriodo').hidden=true;
     if(limpiar) {limpiarFirmas();limpiarResultado();}
+    actualizarBanco();
   }
   $('ndResumen').addEventListener('click',function(e){
     var target=e.target.closest('[data-periodo]');
@@ -526,6 +537,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
   anioConsulta.addEventListener('change',function(){
     modoRegistro=null;
+    anioRuta=Number(anioConsulta.value)||new Date().getFullYear();
     render(true);
   });
   $('ndCerrarPeriodo').addEventListener('click',function(){
@@ -642,6 +654,7 @@ document.addEventListener('DOMContentLoaded', function () {
     $('genero').value='M';
     $('fecha_entrega').value='2027-08-15';
     anioConsulta.value='2027';
+    anioRuta=2027;
     periodoActivo=2;
     modoRegistro=null;
     $('ndConcepto').value='Completar dotación de agosto después del adelanto de abril';
@@ -654,10 +667,263 @@ document.addEventListener('DOMContentLoaded', function () {
   $('ndLimpiarDemo').addEventListener('click',function(){
     if(!window.confirm('¿Borrar TODOS los movimientos de prueba de esta DEMO guardados en este navegador?'))return;
     registros={};
-    try{localStorage.removeItem(STORAGE_KEY);}catch(_){}
+    try{localStorage.removeItem(STORAGE_KEY);localStorage.removeItem(INTENTOS_KEY);}catch(_){}
+    intentos=[];
     render(true);
-    mostrarResultado('Se eliminaron los movimientos ficticios. No se afectó la base de datos.',false);
+    mostrarResultado('Se eliminaron los movimientos ficticios. Las copias guardadas se conservan. No se afectó la base de datos.',false);
   });
+  // ─── Banco de pruebas: navegación guiada, autoguardado y copias ──────────────
+  // Este módulo NO escribe datos en el servidor. Solo usa localStorage y
+  // archivos JSON que el usuario descarga/importa expresamente.
+  function leerCopias() {
+    try {
+      var lista=JSON.parse(localStorage.getItem(SNAPSHOTS_KEY)||'[]');
+      return Array.isArray(lista)?lista.filter(function(c){return c&&c.nombre&&c.registros;}).slice(0,8):[];
+    }catch(_){return [];}
+  }
+  function contarMovimientos(obj) {
+    return Object.keys(obj||{}).reduce(function(n,k){
+      return n+movimientos(obj[k]).length;
+    },0);
+  }
+  function actualizarBanco() {
+    if(!$('ndEstadoGuardado'))return;
+    var total=Object.keys(registros).filter(function(k){return movimientos(registros[k]).length>0;}).length;
+    var mov=contarMovimientos(registros);
+    $('ndEstadoGuardado').textContent=mov?
+      '✓ Guardado automático activo · '+mov+' movimientos en '+total+
+      ' registros principales · Al cerrar esta página, tus pruebas continúan en este mismo navegador.':
+      'Aún no hay movimientos guardados. El primer registro se guardará automáticamente en este navegador.';
+    var year=anioRuta||Number(anioConsulta.value)||new Date().getFullYear();
+    var codigo=$('codigo').value.trim();
+    var p1=registros[clave(codigo,year,1)];
+    var p2=registros[clave(codigo,year,2)];
+    var p3=registros[clave(codigo,year,3)];
+    var p4=registros[clave(codigo,year+1,1)];
+    var normal=function(r){return movimientos(r).some(function(m){return m.tipo==='normal';});};
+    var adelanto=function(r){return movimientos(r).some(function(m){return m.tipo==='adelanto';});};
+    var prueba=function(p){return intentos.some(function(i){return i.codigo===codigo&&i.anio===year&&i.periodo===p&&i.bloqueado;});};
+    var pasos=[
+      {p:1,offset:0,tipo:'normal',titulo:'1. Primera entrega · Abril',ayuda:'Registrar la dotación del periodo 1',hecho:normal(p1)},
+      {p:1,offset:0,tipo:'comprobar',titulo:'2. Intentar una segunda entrega · P1',ayuda:'Debe mostrar bloqueo por duplicado',hecho:prueba(1)},
+      {p:2,offset:0,tipo:'adelanto',titulo:'3. Adelantar parcialmente · P2',ayuda:'Entregar en abril algo de la dotación de agosto',hecho:adelanto(p2)},
+      {p:2,offset:0,tipo:'normal',titulo:'4. Completar dotación · Agosto',ayuda:'Entregar únicamente cantidades pendientes',hecho:normal(p2)},
+      {p:2,offset:0,tipo:'comprobar',titulo:'5. Intentar otra entrega · P2',ayuda:'Debe bloquear la segunda entrega',hecho:prueba(2)},
+      {p:3,offset:0,tipo:'adelanto',titulo:'6. Adelantar dotación · P3',ayuda:'Adelanto en agosto para la entrega de diciembre',hecho:adelanto(p3)},
+      {p:3,offset:0,tipo:'normal',titulo:'7. Completar dotación · Diciembre',ayuda:'Registrar los pendientes de P3',hecho:normal(p3)},
+      {p:1,offset:1,tipo:'adelanto',titulo:'8. Adelantar P1 del siguiente año',ayuda:'Registrar en diciembre un adelanto del próximo abril',hecho:adelanto(p4)}
+    ];
+    $('ndRutaPasos').innerHTML=pasos.map(function(p,i){
+      return '<button class="nd-ruta-paso" data-nd-paso="'+i+'" type="button">'+
+        '<span><strong>'+p.titulo+'</strong><small>'+p.ayuda+' · '+(year+p.offset)+'</small></span>'+
+        '<span class="nd-ruta-marca'+(p.hecho?' finalizado':'')+'">'+(p.hecho?'✓ Registrado':'Probar')+'</span></button>';
+    }).join('');
+    var copias=leerCopias(), selector=$('ndCopiasGuardadas'),valor=selector.value;
+    selector.innerHTML='<option value="">Seleccionar copia...</option>'+
+      copias.map(function(c){
+        return '<option value="'+escapeHtml(c.nombre)+'">'+escapeHtml(c.nombre)+
+          ' · '+escapeHtml(c.guardada||'')+'</option>';
+      }).join('');
+    selector.value=copias.some(function(c){return c.nombre===valor;})?valor:'';
+  }
+  function mensajeBanco(texto,error) {
+    var el=$('ndEscenarioResultado');
+    el.hidden=false;
+    el.className='nd-banco-mensaje'+(error?' error':'');
+    el.textContent=texto;
+  }
+  function irAPaso(i) {
+    var base=anioRuta||Number(anioConsulta.value)||new Date().getFullYear();
+    var codigo=$('codigo').value.trim();
+    if(!codigo){mensajeBanco('Primero busca y selecciona un colaborador ficticio en Datos del Trabajador.',true);return;}
+    var pasos=[
+      {p:1,tipo:'normal'}, {p:1,tipo:'comprobar'},
+      {p:2,tipo:'adelanto'}, {p:2,tipo:'normal'},
+      {p:2,tipo:'comprobar'}, {p:3,tipo:'adelanto'},
+      {p:3,tipo:'normal'}, {p:1,tipo:'adelanto',next:true}
+    ];
+    var paso=pasos[i];if(!paso)return;
+    var anio=base+(paso.next?1:0);
+    anioConsulta.value=anio;
+    periodoActivo=paso.p;
+    modoRegistro=null;
+    render(true);
+    var ctx=contexto();
+    if(!ctx){mensajeBanco('Selecciona un año y una fecha válida para la simulación.',true);return;}
+    if(paso.tipo==='comprobar'){
+      var paraComprobar=contextoPrueba(ctx,'normal');
+      var razon=motivoBloqueo(paraComprobar,registros[ctx.id]);
+      var bloqueado=!!razon;
+      intentos.push({codigo:codigo,anio:anio,periodo:paso.p,tipo:'normal',fecha:paraComprobar.fecha.fecha,
+        bloqueado:bloqueado,motivo:razon||'',registradoEn:new Date().toISOString()});
+      intentos=intentos.slice(-100);
+      try{localStorage.setItem(INTENTOS_KEY,JSON.stringify(intentos));}catch(_){}
+      mensajeBanco(bloqueado?
+        '🛑 PRUEBA SUPERADA: segunda entrega del periodo '+paso.p+'/'+anio+
+        ' rechazada. Motivo: '+razon+' No se creó otro registro.':
+        'Todavía no se bloquea: '+(razon||'aún no has registrado la primera entrega de este periodo.')+
+        ' Registra primero la entrega normal y vuelve a comprobar.',!bloqueado);
+      actualizarBanco();
+      return;
+    }
+    if(paso.tipo==='adelanto'){
+      var radios=form.querySelectorAll('input[name="nd_modalidad"]');
+      Array.prototype.forEach.call(radios,function(r){r.checked=r.value==='parcial';});
+    }
+    var razonActual=motivoBloqueo(contextoPrueba(ctx,paso.tipo),registros[ctx.id]);
+    if(razonActual){
+      mensajeBanco('Esta acción está bloqueada según el historial del periodo '+paso.p+'/'+anio+
+        ': '+razonActual,true);
+      return;
+    }
+    abrirMovimiento(paso.tipo);
+    mensajeBanco('Periodo '+paso.p+'/'+anio+' abierto para '+(paso.tipo==='adelanto'?'adelanto parcial':'entrega normal')+
+      '. Selecciona las prendas, escribe el concepto, dibuja las firmas solicitadas y pulsa Registrar movimiento DEMO.',false);
+  }
+  $('ndRutaPasos').addEventListener('click',function(e){
+    var item=e.target.closest('[data-nd-paso]');
+    if(!item||!this.contains(item))return;
+    irAPaso(Number(item.getAttribute('data-nd-paso')));
+  });
+  $('ndGuardarCopia').addEventListener('click',function(){
+    var nombre=$('ndNombreCopia').value.trim();
+    if(!nombre){mensajeBanco('Escribe un nombre para la copia de prueba.',true);return;}
+    if(!contarMovimientos(registros)){mensajeBanco('Registra al menos un movimiento antes de guardar una copia.',true);return;}
+    var copias=leerCopias(),ya=copias.findIndex(function(c){return c.nombre===nombre;});
+    if(ya>=0&&!window.confirm('Ya existe una copia llamada "'+nombre+'". ¿Reemplazarla?'))return;
+    var copia={nombre:nombre,guardada:new Date().toLocaleString('es-CO'),
+      registros:JSON.parse(JSON.stringify(registros)),intentos:JSON.parse(JSON.stringify(intentos))};
+    if(ya>=0)copias.splice(ya,1);
+    copias.unshift(copia);
+    copias=copias.slice(0,5);
+    try{
+      localStorage.setItem(SNAPSHOTS_KEY,JSON.stringify(copias));
+      actualizarBanco();
+      $('ndCopiasGuardadas').value=nombre;
+      mensajeBanco('✓ Copia "'+nombre+'" guardada en este navegador. Puedes recuperarla cuando quieras.',false);
+    }catch(_){mensajeBanco('No hay suficiente espacio en el navegador para otra copia. Descarga un respaldo JSON.',true);}
+  });
+  function restaurarDatos(obj) {
+    var validados=validarRespaldo(obj);
+    if(!validados)throw Error('El archivo o la copia no contiene movimientos DEMO válidos.');
+    var anterior=registros,previosIntentos=intentos;
+    registros=validados.registros;
+    intentos=validados.intentos;
+    if(!guardarLocal()){
+      registros=anterior;intentos=previosIntentos;
+      throw Error('No hay espacio de almacenamiento disponible para restaurar.');
+    }
+    try{localStorage.setItem(INTENTOS_KEY,JSON.stringify(intentos));}catch(_){}
+    modoRegistro=null;
+    periodoActivo=null;
+    $('ndConcepto').value='';
+    limpiarFirmas();
+    render(true);
+  }
+  function validarRespaldo(obj) {
+    if(!obj||typeof obj!=='object'||Array.isArray(obj)||!obj.registros||typeof obj.registros!=='object'||Array.isArray(obj.registros))return null;
+    var resultado=Object.create(null),claves=Object.keys(obj.registros);
+    if(claves.length>200)return null;
+    for(var i=0;i<claves.length;i++){
+      var claveRegistro=claves[i],match=/^([A-Za-z0-9_-]{1,40})\|(\d{4})\|([123])$/.exec(claveRegistro);
+      if(!match)return null;
+      var raw=obj.registros[claveRegistro],codigo=match[1],anio=Number(match[2]),periodo=Number(match[3]);
+      if(!raw||typeof raw!=='object'||anio<2020||anio>2100||
+        raw.codigo!==codigo||Number(raw.anio)!==anio||Number(raw.periodo)!==periodo||
+        !raw.plan||typeof raw.plan!=='object'||!Array.isArray(raw.movimientos)||raw.movimientos.length>3)return null;
+      var plan=Object.create(null),lista=Object.keys(raw.plan);
+      if(lista.length>10)return null;
+      for(var j=0;j<lista.length;j++){
+        var id=lista[j],p=raw.plan[id];
+        if(!Object.prototype.hasOwnProperty.call(CATALOGO,id)||!p||!Number.isInteger(Number(p.cantidad))||
+          Number(p.cantidad)<1||Number(p.cantidad)>99||String(p.talla||'').length>20)return null;
+        plan[id]={cantidad:Number(p.cantidad),talla:String(p.talla||'').slice(0,20)};
+      }
+      var mm=[];
+      for(var z=0;z<raw.movimientos.length;z++){
+        var m=raw.movimientos[z];
+        if(!m||['normal','adelanto'].indexOf(m.tipo)<0||!fechaValida(m.fecha)||
+          !Array.isArray(m.articulos)||m.articulos.length>10)return null;
+        var articulos=[];
+        for(var a=0;a<m.articulos.length;a++){
+          var ar=m.articulos[a];
+          if(!ar||!Object.prototype.hasOwnProperty.call(CATALOGO,ar.id)||
+            !Number.isInteger(Number(ar.cantidad))||Number(ar.cantidad)<1||Number(ar.cantidad)>99||
+            String(ar.talla||'').length>20)return null;
+          articulos.push({id:ar.id,cantidad:Number(ar.cantidad),talla:String(ar.talla||'').slice(0,20),
+            genero:String(ar.genero||'').slice(0,3)});
+        }
+        var firma=function(v){return typeof v==='string'&&/^data:image\/(jpeg|png);base64,[A-Za-z0-9+/=]+$/.test(v)&&v.length<300000?v:null;};
+        mm.push({tipo:m.tipo,modalidad:String(m.modalidad||'').slice(0,20),
+          fecha:m.fecha,concepto:String(m.concepto||'').slice(0,400),articulos:articulos,
+          firmaTrabajador:firma(m.firmaTrabajador),firmaEncargado:firma(m.firmaEncargado),
+          nombreTrabajador:String(m.nombreTrabajador||'').slice(0,100),
+          centroCostos:String(m.centroCostos||'').slice(0,100),
+          genero:String(m.genero||'').slice(0,3),
+          cambioCarnet:String(m.cambioCarnet||'').slice(0,5),
+          observaciones:String(m.observaciones||'').slice(0,500)});
+      }
+      resultado[claveRegistro]={codigo:codigo,anio:anio,periodo:periodo,plan:plan,movimientos:mm};
+    }
+    var intentosImportados=Array.isArray(obj.intentos)?obj.intentos.slice(-100).filter(function(x){
+      return x&&/^[A-Za-z0-9_-]{1,40}$/.test(String(x.codigo||''))&&
+        Number(x.anio)>=2020&&Number(x.anio)<=2100&&
+        [1,2,3].indexOf(Number(x.periodo))!==-1;
+    }).map(function(x){return {codigo:String(x.codigo),anio:Number(x.anio),periodo:Number(x.periodo),
+      tipo:'normal',fecha:String(x.fecha||'').slice(0,10),bloqueado:!!x.bloqueado,
+      motivo:String(x.motivo||'').slice(0,300),registradoEn:String(x.registradoEn||'').slice(0,30)};}):[];
+    return {registros:resultado,intentos:intentosImportados};
+  }
+  $('ndRecuperarCopia').addEventListener('click',function(){
+    var nombre=$('ndCopiasGuardadas').value,copia=leerCopias().find(function(c){return c.nombre===nombre;});
+    if(!copia){mensajeBanco('Selecciona una copia de prueba guardada.',true);return;}
+    if(!window.confirm('¿Recuperar "'+nombre+'"? Reemplazará los movimientos actuales (puedes descargarlos antes).'))return;
+    try{restaurarDatos(copia);mensajeBanco('✓ Copia "'+nombre+'" recuperada. Selecciona un periodo para continuar.',false);}
+    catch(err){mensajeBanco(err.message,true);}
+  });
+  $('ndEliminarCopia').addEventListener('click',function(){
+    var nombre=$('ndCopiasGuardadas').value;
+    if(!nombre){mensajeBanco('Selecciona primero una copia para eliminar.',true);return;}
+    if(!window.confirm('¿Eliminar únicamente la copia "'+nombre+'"? Los movimientos actuales no se borrarán.'))return;
+    var copias=leerCopias().filter(function(c){return c.nombre!==nombre;});
+    try{localStorage.setItem(SNAPSHOTS_KEY,JSON.stringify(copias));actualizarBanco();mensajeBanco('Copia eliminada; tus registros actuales se conservan.',false);}
+    catch(_){mensajeBanco('No se pudo eliminar la copia.',true);}
+  });
+  $('ndExportarPruebas').addEventListener('click',function(){
+    var contenido={tipo:'gestion-humana-demo-dotaciones',version:1,exportadoEn:new Date().toISOString(),
+      registros:registros,intentos:intentos};
+    try{
+      var archivo=new Blob([JSON.stringify(contenido,null,2)],{type:'application/json;charset=utf-8'});
+      var url=URL.createObjectURL(archivo),a=document.createElement('a');
+      a.href=url;a.download='Dotaciones_DEMO_'+new Date().toISOString().slice(0,10)+'.json';
+      document.body.appendChild(a);a.click();document.body.removeChild(a);
+      setTimeout(function(){URL.revokeObjectURL(url);},1500);
+      mensajeBanco('✓ Respaldo JSON preparado para descargar. Conserva el archivo si necesitas restaurar la prueba.',false);
+    }catch(_){mensajeBanco('El navegador no permitió crear la descarga.',true);}
+  });
+  $('ndImportarPruebas').addEventListener('click',function(){$('ndArchivoImportar').click();});
+  $('ndArchivoImportar').addEventListener('change',function(){
+    var archivo=this.files&&this.files[0];this.value='';
+    if(!archivo)return;
+    if(archivo.size>8000000){mensajeBanco('El archivo supera el máximo permitido de 8 MB.',true);return;}
+    var reader=new FileReader();
+    reader.onload=function(){
+      try {
+        var data=JSON.parse(String(reader.result||''));
+        if(!data||data.tipo!=='gestion-humana-demo-dotaciones'||data.version!==1)
+          throw Error('El archivo no es un respaldo JSON válido de Dotaciones DEMO.');
+        if(!window.confirm('¿Importar este respaldo? Reemplazará tus registros actuales del navegador.'))return;
+        restaurarDatos(data);
+        mensajeBanco('✓ Respaldo importado y guardado. Los movimientos aparecen nuevamente en los periodos.',false);
+      }catch(err){mensajeBanco(err.message||'No se pudo importar el archivo.',true);}
+    };
+    reader.onerror=function(){mensajeBanco('No se pudo leer el archivo seleccionado.',true);};
+    reader.readAsText(archivo);
+  });
+  // El año de recorrido no cambia automáticamente al abrir el periodo 1 del
+  // año siguiente; solo cambia si el usuario selecciona otro año manualmente.
+  anioRuta=Number(anioConsulta.value)||new Date().getFullYear();
+
   // Primero se consultan los periodos. El formulario solo aparece
   // al pulsar una acción explícita dentro del periodo seleccionado.
   render(false);
