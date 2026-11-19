@@ -625,7 +625,10 @@ document.addEventListener('DOMContentLoaded', function () {
       modoRegistro=null; // La entrega termina y vuelve al detalle del periodo.
       render(true);
       var estadoActual=estado(ctx.codigo,ctx.anio,ctx.periodo,ctx.fecha);
-      mostrarResultado('Movimiento DEMO registrado correctamente. Registro único del periodo '+ctx.periodo+'/'+ctx.anio+': '+estadoActual.nombre+'.',false);
+      var confirmacion='Movimiento DEMO registrado correctamente. Registro único del periodo '+ctx.periodo+'/'+ctx.anio+': '+estadoActual.nombre+'.';
+      mostrarResultado(confirmacion,false);
+      mensajeBanco('✓ '+confirmacion+' Tus datos quedaron guardados automáticamente. Puedes continuar con el siguiente paso del recorrido.',false);
+      $('ndBancoDetalles').scrollIntoView({behavior:'smooth',block:'start'});
     }catch(error){mostrarResultado(error.message||'Error al registrar el movimiento.',true);}
   });
   // Ejemplo compartido con el simulador existente, para verificar el mismo historial.
